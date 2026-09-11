@@ -1,0 +1,11 @@
+{
+  "name": "lanka",
+  "owner": { "name": "Lanka" },
+  "plugins": [
+    {
+      "name": "lanka",
+      "source": "./",
+      "description": "Author and edit Lanka chatbot flows from Claude Code."
+    }
+  ]
+}

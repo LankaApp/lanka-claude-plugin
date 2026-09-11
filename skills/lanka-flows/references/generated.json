@@ -1,0 +1,457 @@
+{
+  "format": "lanka-flows/v1",
+  "placeholders": [
+    "bot.username",
+    "bot.public_key",
+    "owner_chat",
+    "app_query",
+    "app_query_and",
+    "site_url"
+  ],
+  "trigger_types": [
+    "command",
+    "text_match",
+    "none"
+  ],
+  "node_types": {
+    "message": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "reply_keyboard": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "wait_for_input": {
+      "slots": {
+        "answer": 0,
+        "timeout": 1
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "condition": {
+      "slots": {
+        "yes": 0,
+        "no": 1
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "url": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": true
+    },
+    "script": {
+      "slots": {
+        "next": 0,
+        "error": 1
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "navigation": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "delay": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "poll": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "web_app": {
+      "slots": {
+        "next": 0,
+        "error": 1
+      },
+      "series": {
+        "hooks": 10
+      },
+      "button_kind": true
+    },
+    "list_buttons": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": true
+    },
+    "check_subscription": {
+      "slots": {
+        "yes": 0,
+        "no": 1
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "notify": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "share": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": true
+    },
+    "switch": {
+      "slots": {},
+      "series": {
+        "branches": 0
+      },
+      "button_kind": false
+    },
+    "remind": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "remove_keyboard": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "typing": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "placeholder": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "visibility": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": false
+    }
+  },
+  "enums": {
+    "condition.operator": [
+      "eq",
+      "neq",
+      "gt",
+      "lt",
+      "gte",
+      "lte",
+      "contains",
+      "is_set",
+      "is_null"
+    ],
+    "navigation.action": [
+      "restart",
+      "start_flow",
+      "go_back",
+      "delete_message",
+      "delete_and_back"
+    ],
+    "wait_for_input.input_kind": [
+      "text",
+      "contact",
+      "location",
+      "photo",
+      "document",
+      "web_app"
+    ],
+    "wait_for_input.timeout_unit": [
+      "seconds",
+      "minutes",
+      "hours"
+    ],
+    "delay.delay_unit": [
+      "seconds",
+      "minutes",
+      "hours"
+    ],
+    "remind.offset_unit": [
+      "minutes",
+      "hours",
+      "days"
+    ],
+    "remind.offset_direction": [
+      "before",
+      "after"
+    ],
+    "notify.interrupt_level": [
+      "when_free",
+      "urgent"
+    ],
+    "share.mode": [
+      "link",
+      "inline"
+    ],
+    "navigation.message_mode": [
+      "resend",
+      "clear_history"
+    ]
+  },
+  "safe_expr": {
+    "functions": [
+      {
+        "name": "min",
+        "minArgs": 2,
+        "maxArgs": 10
+      },
+      {
+        "name": "max",
+        "minArgs": 2,
+        "maxArgs": 10
+      },
+      {
+        "name": "abs",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "floor",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "ceil",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "round",
+        "minArgs": 1,
+        "maxArgs": 2
+      },
+      {
+        "name": "sqrt",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "pow",
+        "minArgs": 2,
+        "maxArgs": 2
+      },
+      {
+        "name": "clamp",
+        "minArgs": 3,
+        "maxArgs": 3
+      },
+      {
+        "name": "len",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "upper",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "lower",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "trim",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "contains",
+        "minArgs": 2,
+        "maxArgs": 2
+      },
+      {
+        "name": "starts_with",
+        "minArgs": 2,
+        "maxArgs": 2
+      },
+      {
+        "name": "ends_with",
+        "minArgs": 2,
+        "maxArgs": 2
+      },
+      {
+        "name": "substr",
+        "minArgs": 2,
+        "maxArgs": 3
+      },
+      {
+        "name": "replace",
+        "minArgs": 3,
+        "maxArgs": 3
+      },
+      {
+        "name": "num",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "to_num",
+        "minArgs": 2,
+        "maxArgs": 2
+      },
+      {
+        "name": "str",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "bool",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "is_num",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "is_str",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "is_bool",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "is_null",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "add_days",
+        "minArgs": 2,
+        "maxArgs": 2
+      },
+      {
+        "name": "get_iso_day",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "format",
+        "minArgs": 2,
+        "maxArgs": 2
+      },
+      {
+        "name": "default",
+        "minArgs": 2,
+        "maxArgs": 2
+      },
+      {
+        "name": "count",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "sort",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "unique",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "join",
+        "minArgs": 2,
+        "maxArgs": 2
+      },
+      {
+        "name": "append",
+        "minArgs": 2,
+        "maxArgs": 2
+      },
+      {
+        "name": "sort_by",
+        "minArgs": 2,
+        "maxArgs": 3
+      },
+      {
+        "name": "take",
+        "minArgs": 2,
+        "maxArgs": 2
+      },
+      {
+        "name": "sum",
+        "minArgs": 1,
+        "maxArgs": 1
+      },
+      {
+        "name": "nth",
+        "minArgs": 2,
+        "maxArgs": 2
+      },
+      {
+        "name": "filter",
+        "minArgs": 2,
+        "maxArgs": 2
+      },
+      {
+        "name": "map",
+        "minArgs": 2,
+        "maxArgs": 2
+      },
+      {
+        "name": "flat_map",
+        "minArgs": 2,
+        "maxArgs": 2
+      },
+      {
+        "name": "find",
+        "minArgs": 2,
+        "maxArgs": 2
+      },
+      {
+        "name": "update_where",
+        "minArgs": 4,
+        "maxArgs": 4
+      }
+    ],
+    "namespaces": [
+      "session",
+      "user",
+      "app",
+      "temp",
+      "platform",
+      "params",
+      "initiator"
+    ]
+  }
+}
