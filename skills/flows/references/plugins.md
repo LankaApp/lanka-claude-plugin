@@ -1,6 +1,6 @@
 # Plugins and `app.*` data
 
-A plugin is a visual editor over `app.*` variables — the data stays in ordinary bot variables that scripts, tokens, `list_buttons` and Mini Apps read. A bot may run several **instances** of one plugin; instance `clinic` keeps its data under `app.clinic.*`, the root instance under `app.*` itself.
+A plugin is a visual editor over `app.*` variables — the data stays in ordinary bot variables that scripts, tokens, `list_buttons` and Mini Apps read. A bot may run several **instances** of one plugin; instance `kiosk` keeps its data under `app.kiosk.*`, the root instance under `app.*` itself.
 
 **Write `app.*` in a document and pass `scope` in the write body** — the server re-roots every `app.` to `app.<scope>.` and fills `{{app_query}}`. Export with `?scope=<scope>` to get portable `app.*` back.
 

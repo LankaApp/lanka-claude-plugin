@@ -9,7 +9,7 @@ A Mini App is a page Lanka hosts and a `web_app` button opens inside Telegram. *
 {{site_url}}/apps/<app>/{{bot.public_key}}?mode=cart{{app_query_and}}    # when the url already has a query
 ```
 
-`{{app_query}}` carries the plugin instance (`?scope=clinic`), empty at the root instance. The app's texts (its `config` keys) are configured on the plugin instance, not in the node; tokens work there.
+`{{app_query}}` carries the plugin instance (`?scope=kiosk`), empty at the root instance. The app's texts (its `config` keys) are configured on the plugin instance, not in the node; tokens work there.
 
 ## Data back into the flow
 

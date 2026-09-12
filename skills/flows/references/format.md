@@ -100,7 +100,7 @@ Mini App url: `{{site_url}}/apps/<app>/{{bot.public_key}}{{app_query}}`.
 ## Write body
 
 ```json
-{ "document": { … }, "params": { "site_url": "…" }, "scope": "clinic" }
+{ "document": { … }, "params": { "site_url": "…" }, "scope": "kiosk" }
 ```
 
 `params.site_url` defaults to the Lanka host; `scope` defaults to the root instance.
