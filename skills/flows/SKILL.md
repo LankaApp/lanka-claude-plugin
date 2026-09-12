@@ -34,7 +34,17 @@ GET /api/v1/context?session=тихий-кіт   # {open: {session, bot: {id, nam
 GET /api/v1/context                     # without a name: the page focused most recently, and the other live pages
 ```
 
-When `open` is present and not `stale`, that bot and flow are what "here", "this flow", "add a button" refer to — do not ask which bot. `node_id` is the node the owner selected; `session_variables` are the names the flow's group already uses. With no session name: one live page in `sessions` — take it; several — ask which one, by name. Either way, from then on that page's name is your session for the chat. With nothing open, list the bots:
+When `open` is present and not `stale`, that bot and flow are what "here", "this flow", "add a button" refer to — do not ask which bot. `node_id` is the node the owner selected; `session_variables` are the names the flow's group already uses. With no session name: one live page in `sessions` — take it; several — ask which one, by name. Either way, from then on that page's name is your session for the chat.
+
+When the user says **"go to …"** («перейди на …», «відкрий …») — a flow by name, or a node — take their page there:
+
+```bash
+POST /api/v1/context/look   # body: {"session": "тихий-кіт", "flow_id": 896, "node_id": 28549}  → {session, flow: {id, name, editor_url}, node_id}
+```
+
+The page switches to that flow of its bot and selects the node; nothing is written. Call it only on that request — never after a plain export or when you are just orienting yourself, or the page will jump around while you read. `404` — no live page of that name, or the flow belongs to another bot.
+
+With nothing open, list the bots:
 
 ```bash
 GET /api/v1/bots                       # [{id, name, platform, username, url}]
