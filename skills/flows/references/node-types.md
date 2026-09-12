@@ -7,9 +7,9 @@
 | type | content | behaviour |
 |---|---|---|
 | `message` | `media_url` (photo url, tokens ok), `reactive` (bool) | Sends the body (as a photo caption when `media_url`). With buttons it waits for a tap; without, continues to `next`. |
-| `reply_keyboard` | as `message` + `keyboard_persistent` (default `true`) | Same, but the buttons are the grey ones under the input. Cannot carry `url`/`share` buttons. A `web_app` button here can `sendData` (an inline one cannot). |
-| `wait_for_input` | `variable_name` (default `"user_input"`), `input_kind` ∈ `text` `contact` `location` `photo` `document` `web_app`, `button_text`, `web_app_url`, `timeout_value`, `timeout_unit` ∈ `seconds` `minutes` `hours`, `media_url`, `reactive` | Sends the prompt, halts until the visitor answers with the right kind; the answer lands in `user.<variable_name>`. `contact` → `{phone_number, first_name, last_name, user_id}`; `location` → `{latitude, longitude}`; `photo` → `{file_id}`; `document` → `{file_id, file_name, mime_type}`; `web_app` → what the app sent. `contact`/`location`/`web_app` show a one-time request button labelled `button_text`. Slots `answer` (0) and `timeout` (1) — the timer arms only when a `timeout` child exists. |
-| `poll` | `question`, `options` (strings), `save_to`, `is_anonymous`, `allows_multiple_answers` | A Telegram poll; halts until answered. Stores the chosen label (or labels) in `user.<save_to>`. |
+| `reply_keyboard` | as `message` + `keyboard_persistent` (default `true` → `is_persistent`) | Same, with a [ReplyKeyboardMarkup](https://core.telegram.org/bots/api#replykeyboardmarkup) instead of an inline one — so no `url`/`share` buttons, and a `web_app` button can send data back ([KeyboardButton](https://core.telegram.org/bots/api#keyboardbutton)). |
+| `wait_for_input` | `variable_name` (default `"user_input"`), `input_kind` ∈ `text` `contact` `location` `photo` `document` `web_app`, `button_text`, `web_app_url`, `timeout_value`, `timeout_unit` ∈ `seconds` `minutes` `hours`, `media_url`, `reactive` | Sends the prompt, halts until the visitor answers with the right kind; the answer lands in `user.<variable_name>`. `contact` → `{phone_number, first_name, last_name, user_id}`; `location` → `{latitude, longitude}`; `photo` → `{file_id}`; `document` → `{file_id, file_name, mime_type}`; `web_app` → what the app sent. `contact`/`location`/`web_app` show a one-time [request button](https://core.telegram.org/bots/api#keyboardbutton) labelled `button_text`. Slots `answer` (0) and `timeout` (1) — the timer arms only when a `timeout` child exists. |
+| `poll` | `question`, `options` (strings), `save_to`, `is_anonymous`, `allows_multiple_answers` | A [poll](https://core.telegram.org/bots/api#sendpoll); halts until answered. Stores the chosen label (or labels) in `user.<save_to>`. |
 | `placeholder` | body only (default «⏳ Хвилинку…») | Sends a message the **next** send edits in place — put it before a slow `script`. |
 | `remove_keyboard` | body (may be empty) | Removes a reply keyboard; with text the message stays, without it is deleted right after. |
 | `typing` | `seconds` (1–5) | Shows «typing…» then continues. |
@@ -21,7 +21,7 @@
 |---|---|---|
 | `condition` | `variable_name`, `operator`, `compare_value` | Slots `yes` (0) / `no` (1). Operators below. |
 | `switch` | `variable_name`, `cases` (strings) | Case *i* → `branches[i]`; no match → `branches[cases.length]` (the fallback, last). String equality. Never renumber existing branches. |
-| `check_subscription` | `channel_chat_id`, `save_to` | `yes` (0) when the visitor is a member of the channel, `no` (1) otherwise or when the check itself fails (the owner gets a report). The bot must be an admin of the channel. |
+| `check_subscription` | `channel_chat_id`, `save_to` | `yes` (0) when the visitor is a member of the channel ([getChatMember](https://core.telegram.org/bots/api#getchatmember)), `no` (1) otherwise or when the check itself fails (the owner gets a report). The bot must be an admin of the channel. |
 | `visibility` | `variable_name`, `operator`, `compare_value` | **First node under a button**: the button shows only while the rule holds. The button's real target — a step or a button kind — is its `next`. No `variable_name` = always visible. |
 
 ### Operators (`condition`, `visibility`)
@@ -43,9 +43,9 @@
 
 | type | content | behaviour |
 |---|---|---|
-| `url` | `url` | The button opens a link. Inline keyboards only. |
-| `share` | `mode` ∈ `link` (default) `inline`, `share_url`, `share_text` | Share via t.me/share (`link`) or the chat picker (`inline`, needs inline mode in @BotFather). Inline keyboards only. |
-| `web_app` | `url` (`{{site_url}}/apps/<app>/{{bot.public_key}}{{app_query}}`), `save_to` (default `web_app_data`) | Opens a hosted Mini App (mini-apps.md). From a **reply** keyboard the app can `sendData`: the payload lands in `user.<save_to>` and the flow continues to `next` (0). `hooks[]` (from index 10) hold the branches that run after the app's hook actions — `script`/`condition` only, the app's values in `session.input`. |
+| `url` | `url` | An [inline button](https://core.telegram.org/bots/api#inlinekeyboardbutton) with `url`. Inline keyboards only. |
+| `share` | `mode` ∈ `link` (default) `inline`, `share_url`, `share_text` | `link` → a `url` button to `t.me/share/url`; `inline` → [`switch_inline_query`](https://core.telegram.org/bots/api#inlinekeyboardbutton) (needs inline mode in @BotFather). Inline keyboards only. |
+| `web_app` | `url` (`{{site_url}}/apps/<app>/{{bot.public_key}}{{app_query}}`), `save_to` (default `web_app_data`) | Opens a hosted [Mini App](https://core.telegram.org/bots/webapps) (mini-apps.md). From a **reply** keyboard the app can [`sendData`](https://core.telegram.org/bots/webapps#initializing-mini-apps): the payload lands in `user.<save_to>` and the flow continues to `next` (0); an inline opening cannot send data. `hooks[]` (from index 10) hold the branches that run after the app's hook actions — `script`/`condition` only, the app's values in `session.input`. |
 | `list_buttons` | `options_var` (a variable holding a list of strings), `save_to`, `buttons_per_row` (≥1) | The button expands into one button per option at send time. A pick writes `user.<save_to>` = the label and `user.<save_to>_index` = its position, then continues to `next`. This is how a choice from data is built — there is no choice node. |
 
 A conditional link/app/list: `{ "text": "…", "node": { "type": "visibility", …, "next": { "type": "url", … } } }`.

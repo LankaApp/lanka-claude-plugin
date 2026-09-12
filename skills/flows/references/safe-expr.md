@@ -31,8 +31,7 @@ slots = temp.resp.status == 200 ? temp.resp.body.slots : []
 | `user.name = …` | forever, per visitor | `user.name` |
 | `app.name = …` | forever, bot-wide (plugin data lives here) | `app.name` |
 | `temp.name = …` | this script only | `temp.name` |
-| `platform.*` | read-only: `user_id`, `first_name`, `last_name`, `full_name`, `username`, `language_code`, `is_premium`, `message_text`, `now` (ISO timestamp) | |
-| `params.*` | read-only, Mini App actions only | |
+| `platform.*` | read-only: `user_id`, `first_name`, `last_name`, `full_name`, `username`, `language_code`, `is_premium`, `message_text`, `start_param` (the data after the dash of the deep link that opened the flow, else empty), `now` (ISO timestamp) | |
 | `initiator.*` | read-only, inside an internal notification flow: the visitor who fired it | |
 | `session.input` | in a Mini App hook branch: what the page posted | `input` |
 
@@ -68,4 +67,4 @@ temp.resp = fetch("https://…", {method: "POST", headers: {…}, body: {…}, c
 
 `###user.name###`, `###session.total###`, `###app.catalog.0.name###`, `###platform.first_name###`, `###initiator.username###`. Always with a namespace — `###score###` does not resolve. No expressions, no formatting: compute in a script, then render. `null` renders as empty, objects/lists as JSON.
 
-Telegram HTML in bodies: `<b> <i> <u> <s> <code> <pre> <a href="…"> <span class="tg-spoiler"> <blockquote>`.
+Bodies are [Telegram HTML](https://core.telegram.org/bots/api#html-style); Lanka passes `<b> <i> <u> <s> <code> <pre> <a href="…"> <span class="tg-spoiler"> <blockquote>` and drops the rest.

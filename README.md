@@ -1,15 +1,15 @@
 # Lanka plugin for Claude Code
 
-Build and edit [Lanka](https://github.com/LankaApp/lanka) chatbot flows from Claude Code. The plugin reads a bot's flows through Lanka's API and writes **drafts** — the owner reviews and publishes them in the Lanka editor. Nothing reaches visitors without that click.
+Build and edit Lanka chatbot flows from Claude Code. The plugin reads a bot's flows through Lanka's API and writes **drafts** — the owner reviews and publishes them in the Lanka editor. Nothing reaches visitors without that click.
 
 ## Setup
 
-1. In Lanka, open **Integrations** (user menu → Інтеграції) and create an API key.
+1. In Lanka, open **Integrations** (user menu) and create an API key.
 2. Save it where the plugin reads it:
 
    ```bash
    mkdir -p ~/.lanka && cat > ~/.lanka/config <<EOF
-   LANKA_API_URL=https://your-lanka-host
+   LANKA_API_URL=https://lanka.bot
    LANKA_API_TOKEN=your-key
    EOF
    chmod 600 ~/.lanka/config
@@ -22,22 +22,22 @@ Build and edit [Lanka](https://github.com/LankaApp/lanka) chatbot flows from Cla
    /plugin install lanka@lanka
    ```
 
-Then ask: *«збери ланку запису на стрижку в боті Barber»* — Claude lists your bots, reads what is there, writes a draft and hands you the editor link.
+   (or, from a checkout: `claude --plugin-dir /path/to/lanka-claude-plugin`)
 
 ## What is inside
 
-- `skills/lanka-flows/SKILL.md` — the workflow: list → export → author → validate → draft → publish in the editor.
-- `skills/lanka-flows/references/` — the `lanka-flows/v1` format, every node type and its content, the safe-expr script language, hosted Mini Apps, plugins and their `app.*` data, worked examples.
+- `skills/flows/SKILL.md` — the workflow: `/lanka:flows <session>` ties the chat to an open editor page (the Claude chip shows the name) → export → author → validate → draft → the owner publishes.
+- `skills/flows/references/` — the `lanka-flows/v1` format, every node type and its content, the safe-expr script language, hosted Mini Apps, plugins and their `app.*` data.
 
 ## Development
 
 ```bash
-claude --plugin-dir /path/to/lanka-claude-plugin
+claude --plugin-dir .
 claude plugin validate .
 ```
 
-`skills/lanka-flows/references/generated.json` comes from Lanka's code — regenerate it after a node type, slot, operator or script function changes:
+`skills/flows/references/generated.json` is produced by Lanka's code — node types, slots, enums, script functions. Regenerate it from a Lanka checkout beside this one after a node type, slot, operator or function changes (Lanka's `spec/claude_plugin_spec.rb` fails when the file here is stale):
 
 ```bash
-cd ../lanka && bin/rails lanka:skill_docs > ../lanka-claude-plugin/skills/lanka-flows/references/generated.json
+cd ../lanka && bin/rails lanka:skill_docs   # writes ../lanka-claude-plugin/skills/flows/references/generated.json
 ```

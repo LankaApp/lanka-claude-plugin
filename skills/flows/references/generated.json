@@ -6,7 +6,8 @@
     "owner_chat",
     "app_query",
     "app_query_and",
-    "site_url"
+    "site_url",
+    "flow.<key>"
   ],
   "trigger_types": [
     "command",
@@ -450,7 +451,6 @@
       "app",
       "temp",
       "platform",
-      "params",
       "initiator"
     ]
   }

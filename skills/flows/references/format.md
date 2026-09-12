@@ -68,6 +68,7 @@ One JSON document describes one or more flows of a bot. The installer, the expor
 | `type` | one of the node types (node-types.md) |
 | `name` | the node's name in the editor; a button child's name usually equals the button text |
 | `id` | the live node this node stands for (from an export) — keeps its identity on publish |
+| `focus` | `true` on one node: where the owner's editor lands after the write |
 | `paragraphs` | the message body: one string per paragraph, Telegram HTML inside. Alternatively `content.html` + `content.text` verbatim |
 | `content` | type-specific keys (node-types.md). Strings may carry `{{placeholders}}` and `###tokens###` |
 | `buttons` | keyboard rows: an entry is one button `{text, node?}` on its own row, or an array — one row of several. A button's `node` is what happens on tap: a step, or a *button kind* (`url`, `web_app`, `share`, `list_buttons`), or a `visibility` node with the kind under it |
@@ -92,7 +93,7 @@ Inside `content`: `target_flow` (navigation `start_flow`) and `notify_flow` (not
 
 ### Placeholders
 
-`{{site_url}}` — this Lanka host; `{{bot.username}}`, `{{bot.public_key}}`; `{{owner_chat}}` — the owner's Telegram id (for `notify` → `target_chat_id`); `{{app_query}}` / `{{app_query_and}}` — `?scope=…` / `&scope=…` of the plugin instance, empty at the root instance. Anything else must be listed in `params` and passed in the write body as `"params": {"name": "value"}`.
+`{{site_url}}` — this Lanka host; `{{bot.username}}`, `{{bot.public_key}}`; `{{owner_chat}}` — the owner's Telegram id (for `notify` → `target_chat_id`); `{{app_query}}` / `{{app_query_and}}` — `?scope=…` / `&scope=…` of the plugin instance, empty at the root instance; `{{flow.<key>}}` — the link key of a flow of this document, for deep links `t.me/{{bot.username}}?start={{flow.<key>}}-<data>`. Anything else must be listed in `params` and passed in the write body as `"params": {"name": "value"}`.
 
 Mini App url: `{{site_url}}/apps/<app>/{{bot.public_key}}{{app_query}}`.
 
