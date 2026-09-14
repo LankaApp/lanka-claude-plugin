@@ -100,3 +100,17 @@ source ~/.lanka/config && curl -sS -X POST -H "Authorization: Bearer $LANKA_API_
 ## 4. Copying flows between bots
 
 Export from the source bot, write to the target: flow `id`s from another bot are ignored and the flows are created. References to flows outside the export stay as ids and are refused on another bot (`422 … is not a flow of this bot`) — include those flows in the export or drop the reference.
+
+## 5. Undoing what you wrote
+
+Three calls remove things. Each is **two steps**: the first request, without `confirm`, answers `428` with a `summary` of what would go and a `confirm` token bound to that one action (valid 10 minutes); the same request with `"confirm": "<token>"` executes it.
+
+```bash
+DELETE /api/v1/bots/:bot_id/flows/:flow_id            # a flow that was NEVER published; refused (422) once published or while another flow starts it
+DELETE /api/v1/bots/:bot_id/flows/:flow_id/draft      # the unpublished changes; the live tree stays
+DELETE /api/v1/bots/:bot_id/app_variables/:key        # an app.* key no node of the bot reads (a text match on `app.<key>`)
+```
+
+Pass `session` too, so the page follows: a deleted flow leaves the sidebar (and the page moves on if it had it open), a discarded draft shows the live tree again.
+
+**The token is not yours to spend.** Before the second request, show the owner the `summary` in the chat — the flow's name and node count, the draft version, the key and its value preview — and send `confirm` only after they say yes to that. A "clean up" or "undo" in the request authorises the first call, never the second. Never delete anything through the editor's own routes, and never ask for a published flow to be removed — that stays with the owner.
