@@ -71,7 +71,7 @@ One JSON document describes one or more flows of a bot. The installer, the expor
 | `focus` | `true` on one node: where the owner's editor lands after the write |
 | `paragraphs` | the message body: one string per paragraph, Telegram HTML inside. Alternatively `content.html` + `content.text` verbatim |
 | `content` | type-specific keys (node-types.md). Strings may carry `{{placeholders}}` and `###tokens###` |
-| `buttons` | keyboard rows: an entry is one button `{text, node?}` on its own row, or an array — one row of several. A button's `node` is what happens on tap: a step, or a *button kind* (`url`, `web_app`, `share`, `list_buttons`), or a `visibility` node with the kind under it |
+| `buttons` | keyboard rows: an entry is one button `{text, node?}` on its own row, or an array — one row of several. A button's `node` is what happens on tap: a step, or a *button kind* (`url`, `web_app`, `share`, `copy_text`, `list_buttons`), or a `visibility` node with the kind under it |
 | slots | one child per slot the type has — see below |
 
 ### Slots by type

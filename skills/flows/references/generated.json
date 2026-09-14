@@ -161,6 +161,13 @@
       },
       "series": {},
       "button_kind": false
+    },
+    "copy_text": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": true
     }
   },
   "enums": {
