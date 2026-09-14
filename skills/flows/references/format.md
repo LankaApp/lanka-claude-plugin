@@ -29,7 +29,7 @@ One JSON document describes one or more flows of a bot. The installer, the expor
 | `title`, `description` | free text, for people |
 | `params` | names of `{{placeholders}}` the caller must supply (besides the built-ins) |
 | `requires.plugins` | plugin ids the flows need (`catalog`, `schedule`) — informational |
-| `seed_app_variables` | `app.*` keys with initial values, written only where the bot has none |
+| `seed_app_variables` | `app.*` keys with initial values, written only where the bot has none. A key is one top-level name, never a path: `{"veres": {"squad": …}}` is read as `app.veres.squad`; `{"veres.squad": …}` stores a variable literally named `veres.squad`, which no token or script can reach |
 | `flows` | the flows, in order |
 
 ## Flow

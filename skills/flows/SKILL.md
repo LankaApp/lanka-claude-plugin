@@ -75,6 +75,7 @@ Rules that are easy to get wrong:
 - Slots are the type's: `answer`/`timeout` on `wait_for_input`, `yes`/`no` on `condition` and `check_subscription`, `next`/`error` on `script`, `next`/`error`/`hooks` on `web_app`, `branches` on `switch`, `next` everywhere else. Anything else is refused.
 - Placeholders: `{{site_url}}`, `{{bot.username}}`, `{{bot.public_key}}`, `{{owner_chat}}`, `{{app_query}}` — use them in URLs and deep links instead of literal hosts and keys. Declare extra params in `"params"` and pass them in the write body.
 - Working inside a plugin instance (its data lives under `app.<scope>.*`)? Write `app.*` in scripts and pass `scope` in the body — the server re-roots it.
+- `seed_app_variables` keys are top-level names, nested with objects: `{"veres": {"squad": …}}` → `app.veres.squad`. A dotted key (`"veres.squad"`) becomes a variable literally named so, and every `app.veres.*` token renders empty.
 - Message text goes in `paragraphs` (plain strings, Telegram HTML allowed: `<b>`, `<i>`, `<code>`, `<a href>`); tokens `###user.name###` render the visitor's variables.
 
 ## 3. Validate, then write

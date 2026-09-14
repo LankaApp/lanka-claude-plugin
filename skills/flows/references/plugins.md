@@ -11,7 +11,7 @@ A plugin is a visual editor over `app.*` variables — the data stays in ordinar
 
 Rules for data flows read: lists of flat objects, stable string ids, numbers as numbers, rich text as an `html` + `text` pair, depth ≤ 5.
 
-`seed_app_variables` in a document writes initial values only where the instance has none — the plugin owns the data afterwards.
+`seed_app_variables` in a document writes initial values only where the instance has none — the plugin owns the data afterwards. Its keys are top-level names; nest with objects (`{"veres": {"squad": …}}`), not with dotted keys.
 
 ## Deep links
 
