@@ -63,6 +63,19 @@ temp.resp = fetch("https://…", {method: "POST", headers: {…}, body: {…}, c
 - **A failed request is data, not an error**: it does not take the script node's `error` branch. Check `temp.resp.status == 200` or `is_null(temp.resp.error)` and branch with a `condition`.
 - Neighbouring fetch lines that do not read each other's results run in parallel (up to 6 per script).
 
+## page_meta and save_image
+
+Two more outbound lines with the same rules as `fetch` (whole line, named `temp.`/`session.` target, a failure is data, same address filter and timeouts), one argument each:
+
+```
+temp.page = page_meta(link)
+temp.photo = save_image(temp.page.image)
+app.catalog = append(app.catalog, {id: "p1", name: temp.page.title, image: temp.photo.url})
+```
+
+- `page_meta(url)` → `{status, title, description, image, url, site, type, extra, error}` — what the page says about itself in its Open Graph / meta tags; `extra` holds non-standard ones (`brand`, `availability`). Redirects are followed. Nothing of the page itself reaches the script.
+- `save_image(url)` → `{url, error}` — the picture copied into the bot's own media (images and video up to 20 MB, type read from the bytes). It stores only in a live dialog: the editor's dry run checks the file and answers with the source url, a Mini App action refuses. Never auto-run by the editor.
+
 ## Tokens in messages
 
 `###user.name###`, `###session.total###`, `###app.catalog.0.name###`, `###platform.first_name###`, `###initiator.username###`. Always with a namespace — `###score###` does not resolve. No expressions, no formatting: compute in a script, then render. `null` renders as empty, objects/lists as JSON.

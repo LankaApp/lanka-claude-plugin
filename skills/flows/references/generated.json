@@ -168,6 +168,13 @@
       },
       "series": {},
       "button_kind": true
+    },
+    "announce": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": false
     }
   },
   "enums": {
@@ -217,6 +224,10 @@
       "after"
     ],
     "notify.interrupt_level": [
+      "when_free",
+      "urgent"
+    ],
+    "announce.interrupt_level": [
       "when_free",
       "urgent"
     ],
