@@ -43,7 +43,7 @@ slots = temp.resp.status == 200 ? temp.resp.body.slots : []
 ## Functions (44)
 
 - Math: `min(a,b,…)` `max(a,b,…)` `abs` `floor` `ceil` `round(x, decimals?)` `sqrt` `pow(x,y)` `clamp(v, lo, hi)`
-- String: `len` (string or list) `upper` `lower` `trim` `contains(s, sub)` `starts_with` `ends_with` `substr(s, start, len?)` `replace(s, from, to)` (all occurrences)
+- String: `len` (string or list) `upper` `lower` `trim` `contains(s, sub)` `starts_with` `ends_with` `substr(s, start, len?)` `replace(s, from, to)` (all occurrences) `split(s, sep)` → list of pieces (`nth(split(url, "/"), 4)`)
 - Conversion: `num(x)` (throws if not numeric) `to_num(x, fallback)` `str(x)` `bool(x)`
 - Checks: `is_num` `is_str` `is_bool` `is_null` (true for unset too)
 - Dates (ISO strings in and out; input must start with `YYYY-MM-DD`): `add_days(date, n)` → `"yyyy-MM-dd"`, `get_iso_day(date)` → 1 (Mon) … 7 (Sun), `format(date, pattern)` — date-fns patterns, e.g. `"dd.MM"`, `"HH:mm"`

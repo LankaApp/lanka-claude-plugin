@@ -333,6 +333,11 @@
         "maxArgs": 3
       },
       {
+        "name": "split",
+        "minArgs": 2,
+        "maxArgs": 2
+      },
+      {
         "name": "num",
         "minArgs": 1,
         "maxArgs": 1
