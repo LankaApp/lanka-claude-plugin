@@ -30,6 +30,7 @@ One JSON document describes one or more flows of a bot. The installer, the expor
 | `params` | names of `{{placeholders}}` the caller must supply (besides the built-ins) |
 | `requires.plugins` | plugin ids the flows need (`catalog`, `schedule`) — informational |
 | `seed_app_variables` | `app.*` keys with initial values, written only where the bot has none. A key is one top-level name, never a path: `{"veres": {"squad": …}}` is read as `app.veres.squad`; `{"veres.squad": …}` stores a variable literally named `veres.squad`, which no token or script can reach |
+| `seed_audiences` | audiences the flows send to: `[{"key", "name", "filters": [{"field", "operator", "value"}]}]`, created on install unless the bot already has one of that name (then the owner's is used as is) |
 | `flows` | the flows, in order |
 
 ## Flow
@@ -89,7 +90,7 @@ A slot the type does not have is refused: *"message «Hi» has no error slot"*.
 
 ### Cross-flow references
 
-Inside `content`: `target_flow` (navigation `start_flow`) and `notify_flow` (notify) name a flow of the **document** by `key`. An export may leave `target_flow_id` / `notify_flow_id` — a numeric id of a flow outside the export; valid only on the same bot.
+Inside `content`: `target_flow` (navigation `start_flow`) and `notify_flow` (notify) name a flow of the **document** by `key`. An export may leave `target_flow_id` / `notify_flow_id` — a numeric id of a flow outside the export; valid only on the same bot. `audience_keys` on an announce names the document's `seed_audiences` by key and resolves into `audience_ids` (added to any ids already there).
 
 ### Placeholders
 
