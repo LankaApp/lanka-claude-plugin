@@ -73,8 +73,8 @@ temp.photo = save_image(temp.page.image)
 app.catalog = append(app.catalog, {id: "p1", name: temp.page.title, image: temp.photo.url})
 ```
 
-- `page_meta(url)` → `{status, title, description, image, url, site, type, extra, error}` — what the page says about itself in its Open Graph / meta tags; `extra` holds non-standard ones (`brand`, `availability`). Redirects are followed. Nothing of the page itself reaches the script.
-- `save_image(url)` → `{url, error}` — the picture copied into the bot's own media (images and video up to 20 MB, type read from the bytes). It stores only in a live dialog: the editor's dry run checks the file and answers with the source url, a Mini App action refuses. Never auto-run by the editor.
+- `page_meta(url)` → `{status, title, description, image, images, url, site, type, extra, error}` — what the page says about itself in its Open Graph / meta tags; `images` is every picture the page shows on the same host as `og:image` (a shop's product photos, up to 10, the main one first); `extra` holds non-standard ones (`brand`, `availability`). Redirects are followed. Nothing else of the page reaches the script.
+- `save_image(url)` or `save_image(list)` → `{url, urls, error}` — the picture(s) copied into the bot's own media (up to 10; `url` is the first) (images and video up to 20 MB, type read from the bytes). It stores only in a live dialog: the editor's dry run checks the file and answers with the source url, a Mini App action refuses. Never auto-run by the editor.
 
 ## Tokens in messages
 

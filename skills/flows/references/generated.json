@@ -175,6 +175,13 @@
       },
       "series": {},
       "button_kind": false
+    },
+    "album": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": false
     }
   },
   "enums": {
