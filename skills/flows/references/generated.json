@@ -440,6 +440,16 @@
         "maxArgs": 2
       },
       {
+        "name": "slice",
+        "minArgs": 3,
+        "maxArgs": 3
+      },
+      {
+        "name": "last",
+        "minArgs": 2,
+        "maxArgs": 2
+      },
+      {
         "name": "sum",
         "minArgs": 1,
         "maxArgs": 1

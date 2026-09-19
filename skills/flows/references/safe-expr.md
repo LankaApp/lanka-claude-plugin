@@ -48,7 +48,7 @@ slots = temp.resp.status == 200 ? temp.resp.body.slots : []
 - Checks: `is_num` `is_str` `is_bool` `is_null` (true for unset too)
 - Dates (ISO strings in and out; input must start with `YYYY-MM-DD`): `add_days(date, n)` → `"yyyy-MM-dd"`, `get_iso_day(date)` → 1 (Mon) … 7 (Sun), `format(date, pattern)` — date-fns patterns, e.g. `"dd.MM"`, `"HH:mm"`
 - Utility: `default(x, fallback)` — fallback only for null/unset (`0` and `""` pass through)
-- Lists: `count` `sort` `unique` `join(list, sep)` `append(list, item)` `sort_by(list, "key", "asc"|"desc")` `take(list, n)` `sum` `nth(list, i)` (out of range → `null`)
+- Lists: `count` `sort` `unique` `join(list, sep)` `append(list, item)` `sort_by(list, "key", "asc"|"desc")` `take(list, n)` `slice(list, start, count)` (a page, 0-based) `last(list, n)` (the tail, in order — the newest of an append-only list) `sum` `nth(list, i)` (out of range → `null`)
 - Lists with `item`: `filter(list, pred)` `map(list, expr)` `flat_map(list, expr)` `find(list, pred)` (element or `null`) `update_where(list, pred, "key", value)`
 
 ## fetch
