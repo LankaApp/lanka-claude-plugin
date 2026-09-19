@@ -37,6 +37,7 @@ slots = temp.resp.status == 200 ? temp.resp.body.slots : []
 
 - A bare read is **session only**; `resp.status` reads `session.resp.status`.
 - Writing a nested path is refused (`user.cart.qty = 1`): rebuild the object, or use `update_where` on a list.
+- `app.*` is shared by every visitor, and two chats changing it at once are safe: a script runs as steps between its `fetch` lines, each step reads the current `app.*` and, if someone wrote it meanwhile, is recomputed over the new data before its own write — both `append`s to `app.orders` land. Nothing to do on the author's side.
 - Names starting with `_` are reserved.
 - Rule of thumb: what the person entered persists (`user.*`), what a script computed lives with the conversation (bare).
 
@@ -60,6 +61,7 @@ temp.resp = fetch("https://…", {method: "POST", headers: {…}, body: {…}, c
 - Only as the **entire right-hand side** of an assignment, and the target must be named: `temp.x` (dropped when the script ends) or `session.x` (kept). A bare target is refused.
 - `body`: an object is JSON-encoded; a string is sent as is. `cache`: seconds (≤3600), only 2xx answers are cached, shared between visitors for an identical request — for a schedule or a catalogue, never a booking. `timeout`: seconds, default 5, max 30.
 - Result: `{status, body, error}`. `body` is parsed JSON or the raw string; on a transport failure `status` is `null` and `error` says why.
+- A `fetch` line pauses the flow on the script node while the request runs in the background (the visitor sees «typing…»); the script resumes at the next line. Nothing changes for the author.
 - **A failed request is data, not an error**: it does not take the script node's `error` branch. Check `temp.resp.status == 200` or `is_null(temp.resp.error)` and branch with a `condition`.
 - Neighbouring fetch lines that do not read each other's results run in parallel (up to 6 per script).
 
