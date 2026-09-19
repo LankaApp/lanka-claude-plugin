@@ -46,6 +46,7 @@ One JSON document describes one or more flows of a bot. The installer, the expor
 | `internal` | `true` for a notification flow that belongs to a `notify` node, hidden from lists |
 | `root` | the first node |
 | `published` | (export only) the live tree, when `root` came from a draft; ignored on write |
+| `unpublished` | (export only) `true` for a flow that was never published — `root` is its draft; other flows still refer to it by key. Ignored on write |
 
 ## Node
 
