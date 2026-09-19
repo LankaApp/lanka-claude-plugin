@@ -13,7 +13,7 @@ A Mini App is a page Lanka hosts and a `web_app` button opens inside Telegram. *
 
 ## Data back into the flow
 
-What the visitor picks comes back through Telegram's [`sendData`](https://core.telegram.org/bots/webapps#initializing-mini-apps) into `user.<save_to>` of the `web_app` node, and the flow continues to its `next`. Telegram allows `sendData` only for a [`KeyboardButton.web_app`](https://core.telegram.org/bots/api#keyboardbutton), i.e. a button on a `reply_keyboard`; an inline button just opens the app.
+What the visitor picks comes back into `user.<save_to>` of the `web_app` node, and the flow continues to its `next`. From a `reply_keyboard` button that is Telegram's [`sendData`](https://core.telegram.org/bots/webapps#initializing-mini-apps); from an inline button, where Telegram gives no such channel, the hosted page posts the same payload to Lanka (`/apps/<app>/<key>/submit`) and closes — the flow sees no difference.
 
 ## Hooks
 
