@@ -52,6 +52,7 @@ GET /api/v1/bots/:bot_id/flows         # [{id, name, group, trigger_type, trigge
 GET /api/v1/bots/:bot_id/flows/export             # the whole bot as one document
 GET /api/v1/bots/:bot_id/flows/:flow_id/export    # one flow (+ the notification flows it fires)
 GET /api/v1/bots/:bot_id/mini_apps                # the Mini Apps this bot's plugins offer, with their contracts
+POST /api/v1/bots/:bot_id/uploads              # body {"url": "https://…/photo.jpg"} (or multipart file) → {url}: the picture copied into the bot's media — put THAT url into media_url or a catalog item, never the foreign one
 ```
 
 Export answers `{document, warnings}`. **Read `warnings` and pass anything relevant to the user** — they name what the format could not carry (raw html, a reference to a flow outside the export).
