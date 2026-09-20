@@ -27,14 +27,14 @@ Responses are JSON. `401` — the key is wrong or revoked; `403` — the account
 
 ## 1. Tie yourself to the editor page, then read
 
-Every open editor page is a **session** with a sayable name (the Claude chip in the editor shows it, e.g. `тихий-кіт`). Given as the skill's argument (`/lanka:flows тихий-кіт`) or mentioned by the user, **keep it for the whole chat**: pass it as `?session=` when reading the context and as `"session"` in every write, so what you write lands on that page and nowhere else.
+Every open bot page is a **session** with a sayable name (the Claude chip in the editor shows it, e.g. `тихий-кіт`); it lives as long as the tab stays on that bot, whichever page of it is open. Given as the skill's argument (`/lanka:flows тихий-кіт`) or mentioned by the user, **keep it for the whole chat**: pass it as `?session=` when reading the context and as `"session"` in every write, so what you write lands on that page and nowhere else.
 
 ```bash
-GET /api/v1/context?session=тихий-кіт   # {open: {session, bot: {id, name}, flow: {id, name, group, draft_dirty, editor_url}, node_id, seen_at, stale, session_variables}, sessions: [{session, bot, flow, focused_at}]}
+GET /api/v1/context?session=тихий-кіт   # {open: {session, bot: {id, name}, page, flow: {id, name, group, draft_dirty, editor_url} | null, node_id, seen_at, stale, session_variables}, sessions: [{session, bot, page, flow, focused_at}]}
 GET /api/v1/context                     # without a name: the page focused most recently, and the other live pages
 ```
 
-When `open` is present and not `stale`, that bot and flow are what "here", "this flow", "add a button" refer to — do not ask which bot. `node_id` is the node the owner selected; `session_variables` are the names the flow's group already uses. With no session name: one live page in `sessions` — take it; several — ask which one, by name. Either way, from then on that page's name is your session for the chat.
+When `open` is present and not `stale`, that bot and flow are what "here", "this flow", "add a button" refer to — do not ask which bot. `flow` is `null` while the tab is on another page of the bot (`page` says which: `broadcasts`, `users`, …) — then "here" is the bot, and "this flow" needs a name; a write or a look takes the tab into the editor by itself. `node_id` is the node the owner selected; `session_variables` are the names the flow's group already uses. With no session name: one live page in `sessions` — take it; several — ask which one, by name. Either way, from then on that page's name is your session for the chat.
 
 When the user says **"go to …"** («перейди на …», «відкрий …») — a flow by name, or a node — take their page there:
 
