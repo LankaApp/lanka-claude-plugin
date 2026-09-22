@@ -251,236 +251,283 @@
     "functions": [
       {
         "name": "min",
+        "sig": "min(a, b, ...)",
         "minArgs": 2,
         "maxArgs": 10
       },
       {
         "name": "max",
+        "sig": "max(a, b, ...)",
         "minArgs": 2,
         "maxArgs": 10
       },
       {
         "name": "abs",
+        "sig": "abs(x)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "floor",
+        "sig": "floor(x)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "ceil",
+        "sig": "ceil(x)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "round",
+        "sig": "round(x, decimals?)",
         "minArgs": 1,
         "maxArgs": 2
       },
       {
         "name": "sqrt",
+        "sig": "sqrt(x)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "pow",
+        "sig": "pow(x, y)",
         "minArgs": 2,
         "maxArgs": 2
       },
       {
         "name": "clamp",
+        "sig": "clamp(val, min, max)",
         "minArgs": 3,
         "maxArgs": 3
       },
       {
         "name": "len",
+        "sig": "len(s)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "upper",
+        "sig": "upper(s)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "lower",
+        "sig": "lower(s)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "trim",
+        "sig": "trim(s)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "contains",
+        "sig": "contains(s, sub)",
         "minArgs": 2,
         "maxArgs": 2
       },
       {
         "name": "starts_with",
+        "sig": "starts_with(s, prefix)",
         "minArgs": 2,
         "maxArgs": 2
       },
       {
         "name": "ends_with",
+        "sig": "ends_with(s, suffix)",
         "minArgs": 2,
         "maxArgs": 2
       },
       {
         "name": "substr",
+        "sig": "substr(s, start, len?)",
         "minArgs": 2,
         "maxArgs": 3
       },
       {
         "name": "replace",
+        "sig": "replace(s, from, to)",
         "minArgs": 3,
         "maxArgs": 3
       },
       {
         "name": "split",
+        "sig": "split(s, sep)",
         "minArgs": 2,
         "maxArgs": 2
       },
       {
         "name": "num",
+        "sig": "num(x)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "to_num",
+        "sig": "to_num(x, fallback)",
         "minArgs": 2,
         "maxArgs": 2
       },
       {
         "name": "str",
+        "sig": "str(x)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "bool",
+        "sig": "bool(x)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "is_num",
+        "sig": "is_num(x)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "is_str",
+        "sig": "is_str(x)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "is_bool",
+        "sig": "is_bool(x)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "is_null",
+        "sig": "is_null(x)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "add_days",
+        "sig": "add_days(date, n)",
         "minArgs": 2,
         "maxArgs": 2
       },
       {
         "name": "get_iso_day",
+        "sig": "get_iso_day(date)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "format",
+        "sig": "format(date, pattern)",
         "minArgs": 2,
         "maxArgs": 2
       },
       {
         "name": "default",
+        "sig": "default(x, fallback)",
         "minArgs": 2,
         "maxArgs": 2
       },
       {
         "name": "count",
+        "sig": "count(list)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "sort",
+        "sig": "sort(list)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "unique",
+        "sig": "unique(list)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "join",
+        "sig": "join(list, sep)",
         "minArgs": 2,
         "maxArgs": 2
       },
       {
         "name": "append",
+        "sig": "append(list, item)",
         "minArgs": 2,
         "maxArgs": 2
       },
       {
         "name": "sort_by",
+        "sig": "sort_by(list, key, dir?)",
         "minArgs": 2,
         "maxArgs": 3
       },
       {
         "name": "take",
+        "sig": "take(list, n)",
         "minArgs": 2,
         "maxArgs": 2
       },
       {
         "name": "slice",
+        "sig": "slice(list, start, count)",
         "minArgs": 3,
         "maxArgs": 3
       },
       {
         "name": "last",
+        "sig": "last(list, n)",
         "minArgs": 2,
         "maxArgs": 2
       },
       {
         "name": "sum",
+        "sig": "sum(list)",
         "minArgs": 1,
         "maxArgs": 1
       },
       {
         "name": "nth",
+        "sig": "nth(list, i)",
         "minArgs": 2,
         "maxArgs": 2
       },
       {
         "name": "filter",
+        "sig": "filter(list, expr)",
         "minArgs": 2,
         "maxArgs": 2
       },
       {
         "name": "map",
+        "sig": "map(list, expr)",
         "minArgs": 2,
         "maxArgs": 2
       },
       {
         "name": "flat_map",
+        "sig": "flat_map(list, expr)",
         "minArgs": 2,
         "maxArgs": 2
       },
       {
         "name": "find",
+        "sig": "find(list, expr)",
         "minArgs": 2,
         "maxArgs": 2
       },
       {
         "name": "update_where",
+        "sig": "update_where(list, expr, key, value)",
         "minArgs": 4,
         "maxArgs": 4
       }
