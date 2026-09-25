@@ -36,6 +36,7 @@ Build and edit Lanka chatbot flows from Claude Code. The plugin reads a bot's fl
 
 - `skills/flows/SKILL.md` — the workflow: `/lanka:flows <session>` ties the chat to an open editor page (the Claude chip shows the name) → export → author → validate → draft → the owner publishes.
 - `skills/flows/references/` — the `lanka-flows/v1` format, every node type and its content, the safe-expr script language, hosted Mini Apps, plugins and their `app.*` data.
+- `chatgpt/` — the same skill as a Custom GPT for ChatGPT: instructions, the Actions schema and how to set it up.
 
 ## Development
 
