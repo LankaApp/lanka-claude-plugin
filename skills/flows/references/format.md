@@ -71,7 +71,7 @@ One JSON document describes one or more flows of a bot. The installer, the expor
 | `name` | the node's name in the editor; a button child's name usually equals the button text |
 | `id` | the live node this node stands for (from an export) — keeps its identity on publish |
 | `focus` | `true` on one node: where the owner's editor lands after the write |
-| `paragraphs` | the message body: one string per paragraph, Telegram HTML inside. Alternatively `content.html` + `content.text` verbatim |
+| `paragraphs` | the message body: one string per paragraph, Telegram HTML inside; paragraphs are joined with an empty line. Alternatively `content.html` + `content.text` verbatim — see *Lines without a gap* |
 | `content` | type-specific keys (node-types.md). Strings may carry `{{placeholders}}` and `###tokens###` |
 | `buttons` | keyboard rows: an entry is one button `{text, node?}` on its own row, or an array — one row of several. A button's `node` is what happens on tap: a step, or a *button kind* (`url`, `web_app`, `share`, `copy_text`, `list_buttons`), or a `visibility` node with the kind under it |
 | slots | one child per slot the type has — see below |
@@ -89,9 +89,22 @@ One JSON document describes one or more flows of a bot. The installer, the expor
 
 A slot the type does not have is refused: *"message «Hi» has no error slot"*.
 
+### Lines without a gap
+
+`paragraphs: ["a", "b"]` is `<p>a</p><p></p><p>b</p>` — the empty `<p></p>` is the blank line. For lines that follow each other directly, write the body yourself: every line its own `<p>`, an empty `<p></p>` only where a gap belongs, and `text` the same with `\n`:
+
+```json
+"content": {
+  "html": "<p><b>Траси</b></p><p></p><p>1. Щілина — <b>5b</b></p><p>2. Горобина — <b>6a</b></p>",
+  "text": "Траси\n\n1. Щілина — 5b\n2. Горобина — 6a"
+}
+```
+
+Never `\n` inside a paragraph: it sends fine, but the editor drops it the moment the owner saves the node, and the lines run together. `<br>` survives the editor, but adjacent `<p>`s are what the owner's own lines look like.
+
 ### Cross-flow references
 
-Inside `content`: `target_flow` (navigation `start_flow`) and `notify_flow` (notify) name a flow of the **document** by `key`. An export may leave `target_flow_id` / `notify_flow_id` — a numeric id of a flow outside the export; valid only on the same bot. `audience_keys` on an announce names the document's `seed_audiences` by key and resolves into `audience_ids` (added to any ids already there).
+Inside `content`: `target_flow` (navigation `start_flow`) and `notify_flow` (notify) name a flow of the **document** by `key`. An export may leave `target_flow_id` / `notify_flow_id` — a numeric id of a flow outside the export; valid only on the same bot. Writing back fewer flows than you exported? A key of a flow you left out (`"flow_8"`, `"faq"`) still names it: the writer looks it up among the bot's flows by the key the export gives it, and refuses a key no flow or several flows answer to. `audience_keys` on an announce names the document's `seed_audiences` by key and resolves into `audience_ids` (added to any ids already there).
 
 ### Placeholders
 
