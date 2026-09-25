@@ -53,7 +53,11 @@ GET /api/v1/bots/:bot_id/flows/export             # the whole bot as one documen
 GET /api/v1/bots/:bot_id/flows/:flow_id/export    # one flow (+ the notification flows it fires)
 GET /api/v1/bots/:bot_id/mini_apps                # the Mini Apps this bot's plugins offer, with their contracts
 POST /api/v1/bots/:bot_id/uploads              # body {"url": "https://…/photo.jpg"} (or multipart file) → {url}: the picture copied into the bot's media — put THAT url into media_url or a catalog item, never the foreign one
+GET /api/v1/bots/:bot_id/app/:key?scope=       # one app.* value → {key, scope, value, version}
+PUT /api/v1/bots/:bot_id/app/:key              # body {"value": …, "version": "…"} — replaces it; 409 when version is stale
 ```
+
+`app.*` is live data, not a draft: a `PUT` reaches visitors at once. Read it freely; write it only when the owner asks for that very change, and say what the value becomes.
 
 Export answers `{document, warnings}`. **Read `warnings` and pass anything relevant to the user** — they name what the format could not carry (raw html, a reference to a flow outside the export).
 
@@ -77,7 +81,9 @@ Rules that are easy to get wrong:
 - Placeholders: `{{site_url}}`, `{{bot.username}}`, `{{bot.public_key}}`, `{{owner_chat}}`, `{{app_query}}` — use them in URLs and deep links instead of literal hosts and keys. Declare extra params in `"params"` and pass them in the write body.
 - Working inside a plugin instance (its data lives under `app.<scope>.*`)? Write `app.*` in scripts and pass `scope` in the body — the server re-roots it.
 - `seed_app_variables` keys are top-level names, nested with objects: `{"veres": {"squad": …}}` → `app.veres.squad`. A dotted key (`"veres.squad"`) becomes a variable literally named so, and every `app.veres.*` token renders empty.
-- Message text goes in `paragraphs` (plain strings, Telegram HTML allowed: `<b>`, `<i>`, `<code>`, `<a href>`); tokens `###user.name###` render the visitor's variables.
+- Message text goes in `paragraphs` (plain strings, Telegram HTML allowed: `<b>`, `<i>`, `<code>`, `<a href>`); tokens `###user.name###` render the visitor's variables. Paragraphs are separated by an empty line. For lines with no gap between them (a list, a table of routes) never put `\n` inside a paragraph — the editor drops it the first time the owner saves the node and the lines run together. Write `content.html` with adjacent `<p>`s instead (format.md).
+- `seed_app_variables` land when the draft is written, not when it is published, and only where the key is missing — a second write never replaces them.
+- A tap continues the conversation that sent the button, and a visitor keeps at most 5 open ones; a tap on an older, closed one restarts that flow from its root. State a later tap must find (a moderation queue, a booking in progress) belongs in `app.*` or `user.*`, keyed by an id the button's script checks — not in `session.*` alone.
 
 ## 3. Validate, then write
 
