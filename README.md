@@ -5,7 +5,7 @@ Build and edit Lanka chatbot flows from Claude Code. The plugin reads a bot's fl
 ## Setup
 
 1. In Lanka, open **Integrations** (user menu) and create an API key.
-2. Save it where the plugin reads it:
+2. Save it where the plugin reads it (Integrations shows these commands with your key filled in). macOS and Linux:
 
    ```bash
    mkdir -p ~/.lanka && cat > ~/.lanka/config <<EOF
@@ -13,6 +13,14 @@ Build and edit Lanka chatbot flows from Claude Code. The plugin reads a bot's fl
    LANKA_API_TOKEN=your-key
    EOF
    chmod 600 ~/.lanka/config
+   ```
+
+   Windows, in PowerShell. Claude Code runs the plugin's commands in Git Bash, so the file needs LF line ends — a CR would stick to the values:
+
+   ```powershell
+   $config = "LANKA_API_URL=https://lanka.bot`nLANKA_API_TOKEN=your-key`n"
+   New-Item -ItemType Directory -Force "$HOME\.lanka" | Out-Null
+   [IO.File]::WriteAllText("$HOME\.lanka\config", $config)
    ```
 
 3. In Claude Code:
