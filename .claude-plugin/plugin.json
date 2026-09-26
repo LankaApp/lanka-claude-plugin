@@ -1,7 +1,7 @@
 {
   "name": "lanka",
   "description": "Author and edit Lanka chatbot flows from Claude Code: read a bot's flows, write drafts the owner publishes in the editor.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": { "name": "Lanka" },
   "repository": "https://github.com/LankaApp/lanka-claude-plugin",
   "license": "MIT"
