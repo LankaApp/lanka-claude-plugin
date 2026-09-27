@@ -15,7 +15,7 @@ Rules for data flows read: lists of flat objects, stable string ids, numbers as 
 
 ## Deep links
 
-Every flow is reachable by `https://t.me/{{bot.username}}?start=<payload>`, no setup. The payload names the flow by its link key — `{{flow.<key>}}` in a document — or by its command (`?start=shop` opens `/shop`), and may carry data after a dash: `?start={{flow.card}}-sneakers` opens `card` with `platform.start_param = "sneakers"`. A payload naming nothing opens `/start`. Internal flows cannot be linked to.
+Every flow is reachable by `https://t.me/{{bot.username}}?start=<payload>`, no setup. The payload names the flow by its link key — `{{flow.<key>}}` in a document — or by its command (`?start=shop` opens `/shop`), and may carry data after a dash: `?start={{flow.card}}-sneakers` opens `card` with `platform.start_param = "sneakers"`, which the conversation keeps as `session.start_param`. A payload naming nothing opens `/start`. Internal flows cannot be linked to.
 
 ```
 "script": "price_list = join(map(app.catalog, \"<a href='https://t.me/{{bot.username}}?start={{flow.card}}-\" + item.id + \"'>\" + item.name + \"</a>\"), \"\\n\")"
