@@ -19,12 +19,15 @@
 
 | type | content | behaviour |
 |---|---|---|
-| `condition` | `variable_name`, `operator`, `compare_value` | Slots `yes` (0) / `no` (1). Operators below. |
+| `condition` | `groups` — or, for one rule, `variable_name`, `operator`, `compare_value` inline | Slots `yes` (0) / `no` (1). Rules and operators below. |
 | `switch` | `variable_name`, `cases` (strings) | Case *i* → `branches[i]`; no match → `branches[cases.length]` (the fallback, last). String equality. Never renumber existing branches. |
 | `check_subscription` | `channel_chat_id`, `save_to` | `yes` (0) when the visitor is a member of the channel ([getChatMember](https://core.telegram.org/bots/api#getchatmember)), `no` (1) otherwise or when the check itself fails (the owner gets a report). The bot must be an admin of the channel. |
-| `visibility` | `variable_name`, `operator`, `compare_value` | **First node under a button**: the button shows only while the rule holds. The button's real target — a step or a button kind — is its `next`. No `variable_name` = always visible. |
+| `visibility` | as `condition` | **First node under a button**: the button shows only while the condition holds. The button's real target — a step or a button kind — is its `next`. No `variable_name` = always visible. |
 
-### Operators (`condition`, `visibility`)
+### Rules and operators (`condition`, `visibility`)
+
+A rule is `{variable_name, operator, compare_value}`. `groups` is a list of groups, each a list of rules: the condition holds when **any** group has **every** one of its rules hold — `[[a, b], [c]]` reads "(a and b) or c". One rule may still be written inline instead of `groups`. A rule without `variable_name` is ignored; no rule at all — a condition compares the empty value, a visibility always shows.
+
 
 `eq` `neq` — string equality (`1` equals `"1"`); `gt` `lt` `gte` `lte` — numeric; `contains` — substring / list member / object key; `is_set` — present (note: `false`, `""`, `[]` are **not** set); `is_null` — unset. `is_set`/`is_null` ignore `compare_value`.
 
