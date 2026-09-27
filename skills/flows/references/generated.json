@@ -208,8 +208,7 @@
       "contact",
       "location",
       "photo",
-      "document",
-      "web_app"
+      "document"
     ],
     "wait_for_input.timeout_unit": [
       "seconds",
