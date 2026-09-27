@@ -23,14 +23,18 @@ Build and edit Lanka chatbot flows from Claude Code. The plugin reads a bot's fl
    [IO.File]::WriteAllText("$HOME\.lanka\config", $config)
    ```
 
-3. In Claude Code:
+3. Install the plugin. In Claude Code in a terminal (`claude`, also inside VS Code or JetBrains):
 
    ```
    /plugin marketplace add LankaApp/lanka-claude-plugin
    /plugin install lanka@lanka
    ```
 
+   In the Claude desktop app, Code tab: **+ → Plugins → Add plugin**, enter `LankaApp/lanka-claude-plugin`, then install `lanka`.
+
    (or, from a checkout: `claude --plugin-dir /path/to/lanka-claude-plugin`)
+
+   The plugin works only where Claude Code runs on your computer: it reads `~/.lanka/config` and calls the Lanka API. A claude.ai chat or a cloud session at claude.ai/code has neither.
 
 ## What is inside
 
