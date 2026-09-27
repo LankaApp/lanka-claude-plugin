@@ -31,7 +31,7 @@ slots = temp.resp.status == 200 ? temp.resp.body.slots : []
 | `user.name = …` | forever, per visitor | `user.name` |
 | `app.name = …` | forever, bot-wide (plugin data lives here) | `app.name` |
 | `temp.name = …` | this script only | `temp.name` |
-| `platform.*` | read-only: `user_id`, `first_name`, `last_name`, `full_name`, `username`, `language_code`, `is_premium`, `message_text`, `start_param` (the data after the dash of the deep link that opened the flow, else empty), `now` (ISO timestamp) | |
+| `platform.*` | read-only: `user_id`, `first_name`, `last_name`, `full_name`, `username`, `language_code`, `is_premium`, `message_text`, `start_param`, `now` (ISO timestamp). `message_text` and `start_param` belong to the message being handled: `start_param` is the data after the dash of a deep link, only while that `/start` is handled — the conversation it opened keeps it as `session.start_param` | |
 | `initiator.*` | read-only, inside an internal notification flow: the visitor who fired it | |
 | `session.input` | in a Mini App hook branch: what the page posted | `input` |
 
