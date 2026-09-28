@@ -178,7 +178,8 @@
     },
     "album": {
       "slots": {
-        "next": 0
+        "next": 0,
+        "no_images": 1
       },
       "series": {},
       "button_kind": false
