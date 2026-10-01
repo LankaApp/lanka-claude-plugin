@@ -234,6 +234,21 @@
       "hours",
       "days"
     ],
+    "message.delete_after_unit": [
+      "minutes",
+      "hours",
+      "days"
+    ],
+    "album.delete_after_unit": [
+      "minutes",
+      "hours",
+      "days"
+    ],
+    "voice.delete_after_unit": [
+      "minutes",
+      "hours",
+      "days"
+    ],
     "remind.offset_direction": [
       "before",
       "after"
