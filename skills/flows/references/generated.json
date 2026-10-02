@@ -29,14 +29,6 @@
       "series": {},
       "button_kind": false
     },
-    "wait_for_input": {
-      "slots": {
-        "answer": 0,
-        "timeout": 1
-      },
-      "series": {},
-      "button_kind": false
-    },
     "condition": {
       "slots": {
         "yes": 0,
@@ -204,6 +196,46 @@
       },
       "series": {},
       "button_kind": false
+    },
+    "ask_text": {
+      "slots": {
+        "answer": 0,
+        "timeout": 1
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "ask_contact": {
+      "slots": {
+        "answer": 0,
+        "timeout": 1
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "ask_location": {
+      "slots": {
+        "answer": 0,
+        "timeout": 1
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "ask_file": {
+      "slots": {
+        "answer": 0,
+        "timeout": 1
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "ask_voice": {
+      "slots": {
+        "answer": 0,
+        "timeout": 1
+      },
+      "series": {},
+      "button_kind": false
     }
   },
   "enums": {
@@ -225,19 +257,10 @@
       "delete_message",
       "delete_and_back"
     ],
-    "wait_for_input.input_kind": [
-      "text",
-      "contact",
-      "location",
+    "ask_file.accept": [
+      "any",
       "photo",
-      "document",
-      "file",
-      "voice"
-    ],
-    "wait_for_input.timeout_unit": [
-      "seconds",
-      "minutes",
-      "hours"
+      "document"
     ],
     "delay.delay_unit": [
       "seconds",
@@ -279,6 +302,31 @@
     "navigation.message_mode": [
       "resend",
       "clear_history"
+    ],
+    "ask_text.timeout_unit": [
+      "seconds",
+      "minutes",
+      "hours"
+    ],
+    "ask_contact.timeout_unit": [
+      "seconds",
+      "minutes",
+      "hours"
+    ],
+    "ask_location.timeout_unit": [
+      "seconds",
+      "minutes",
+      "hours"
+    ],
+    "ask_file.timeout_unit": [
+      "seconds",
+      "minutes",
+      "hours"
+    ],
+    "ask_voice.timeout_unit": [
+      "seconds",
+      "minutes",
+      "hours"
     ]
   },
   "safe_expr": {
