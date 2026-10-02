@@ -197,6 +197,13 @@
       },
       "series": {},
       "button_kind": false
+    },
+    "location": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": false
     }
   },
   "enums": {
@@ -564,7 +571,8 @@
       "app",
       "temp",
       "platform",
-      "initiator"
+      "initiator",
+      "secret"
     ]
   }
 }
