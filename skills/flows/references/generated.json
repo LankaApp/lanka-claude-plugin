@@ -190,6 +190,13 @@
       },
       "series": {},
       "button_kind": false
+    },
+    "temporary": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": false
     }
   },
   "enums": {
@@ -230,6 +237,17 @@
       "hours"
     ],
     "remind.offset_unit": [
+      "minutes",
+      "hours",
+      "days"
+    ],
+    "temporary.kind": [
+      "message",
+      "album",
+      "voice"
+    ],
+    "temporary.delete_after_unit": [
+      "seconds",
       "minutes",
       "hours",
       "days"
