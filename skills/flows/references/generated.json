@@ -190,6 +190,13 @@
       },
       "series": {},
       "button_kind": false
+    },
+    "temporary": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": false
     }
   },
   "enums": {
@@ -234,17 +241,12 @@
       "hours",
       "days"
     ],
-    "message.delete_after_unit": [
-      "minutes",
-      "hours",
-      "days"
+    "temporary.kind": [
+      "message",
+      "album",
+      "voice"
     ],
-    "album.delete_after_unit": [
-      "minutes",
-      "hours",
-      "days"
-    ],
-    "voice.delete_after_unit": [
+    "temporary.delete_after_unit": [
       "minutes",
       "hours",
       "days"
