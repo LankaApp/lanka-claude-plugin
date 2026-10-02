@@ -231,6 +231,7 @@
       "location",
       "photo",
       "document",
+      "file",
       "voice"
     ],
     "wait_for_input.timeout_unit": [
