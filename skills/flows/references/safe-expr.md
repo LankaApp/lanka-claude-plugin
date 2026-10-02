@@ -33,6 +33,7 @@ slots = temp.resp.status == 200 ? temp.resp.body.slots : []
 | `temp.name = …` | this script only | `temp.name` |
 | `platform.*` | read-only: `user_id`, `first_name`, `last_name`, `full_name`, `username`, `language_code`, `is_premium`, `message_text`, `start_param`, `now` (ISO timestamp). `message_text` and `start_param` belong to the message being handled: `start_param` is the data after the dash of a deep link, only while that `/start` is handled — the conversation it opened keeps it as `session.start_param` | |
 | `initiator.*` | read-only, inside an internal notification flow: the visitor who fired it | |
+| `secret.*` | read-only, only inside `fetch(...)`, `page_meta(...)` and `save_image(...)` (url, headers, body): the bot's secrets, set by the owner in the bot's settings — `headers: {Authorization: "Bearer " + secret.API_KEY}`. The value goes in only at request time and is replaced by `‹secret.NAME›` in what comes back; a script that reads `secret.*` anywhere else is refused | |
 | `session.input` | in a Mini App hook branch: what the page posted | `input` |
 
 - A bare read is **session only**; `resp.status` reads `session.resp.status`.
