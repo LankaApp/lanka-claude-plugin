@@ -247,6 +247,7 @@
       "voice"
     ],
     "temporary.delete_after_unit": [
+      "seconds",
       "minutes",
       "hours",
       "days"
