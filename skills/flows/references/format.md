@@ -80,7 +80,9 @@ One JSON document describes one or more flows of a bot. The installer, the expor
 
 | type | slots |
 |---|---|
-| `wait_for_input` | `answer` (index 0), `timeout` (1) |
+| `ask_text`, `ask_contact`, `ask_location`, `ask_file`, `ask_voice` | `answer` (index 0), `timeout` (1) |
+| `invoice_stars`, `invoice_card` | `next` (0, at once), `paid` (1), `timeout` (2) |
+| `channel_access` | `next` (0), `expiring` (1), `expired` (2), `failed` (3) |
 | `condition`, `check_subscription` | `yes` (0), `no` (1) |
 | `script` | `next` (0), `error` (1) |
 | `web_app` | `next` (0, after sendData), `error` (1), `hooks` (series from 10: one entry per hook of the app, `null` for a hook without a branch) |
