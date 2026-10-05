@@ -29,14 +29,6 @@
       "series": {},
       "button_kind": false
     },
-    "wait_for_input": {
-      "slots": {
-        "answer": 0,
-        "timeout": 1
-      },
-      "series": {},
-      "button_kind": false
-    },
     "condition": {
       "slots": {
         "yes": 0,
@@ -204,6 +196,81 @@
       },
       "series": {},
       "button_kind": false
+    },
+    "invoice_stars": {
+      "slots": {
+        "next": 0,
+        "paid": 1,
+        "timeout": 2
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "invoice_card": {
+      "slots": {
+        "next": 0,
+        "paid": 1,
+        "timeout": 2
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "channel_access": {
+      "slots": {
+        "next": 0,
+        "expiring": 1,
+        "expired": 2,
+        "failed": 3
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "channel_revoke": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "ask_text": {
+      "slots": {
+        "answer": 0,
+        "timeout": 1
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "ask_contact": {
+      "slots": {
+        "answer": 0,
+        "timeout": 1
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "ask_location": {
+      "slots": {
+        "answer": 0,
+        "timeout": 1
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "ask_file": {
+      "slots": {
+        "answer": 0,
+        "timeout": 1
+      },
+      "series": {},
+      "button_kind": false
+    },
+    "ask_voice": {
+      "slots": {
+        "answer": 0,
+        "timeout": 1
+      },
+      "series": {},
+      "button_kind": false
     }
   },
   "enums": {
@@ -225,19 +292,10 @@
       "delete_message",
       "delete_and_back"
     ],
-    "wait_for_input.input_kind": [
-      "text",
-      "contact",
-      "location",
+    "ask_file.accept": [
+      "any",
       "photo",
-      "document",
-      "file",
-      "voice"
-    ],
-    "wait_for_input.timeout_unit": [
-      "seconds",
-      "minutes",
-      "hours"
+      "document"
     ],
     "delay.delay_unit": [
       "seconds",
@@ -245,6 +303,7 @@
       "hours"
     ],
     "remind.offset_unit": [
+      "seconds",
       "minutes",
       "hours",
       "days"
@@ -254,7 +313,127 @@
       "album",
       "voice"
     ],
+    "invoice_card.currency": [
+      "AED",
+      "AFN",
+      "ALL",
+      "AMD",
+      "ARS",
+      "AUD",
+      "AZN",
+      "BAM",
+      "BDT",
+      "BGN",
+      "BHD",
+      "BND",
+      "BOB",
+      "BRL",
+      "BYN",
+      "CAD",
+      "CHF",
+      "CLP",
+      "CNY",
+      "COP",
+      "CRC",
+      "CZK",
+      "DKK",
+      "DOP",
+      "DZD",
+      "EGP",
+      "ETB",
+      "EUR",
+      "GBP",
+      "GEL",
+      "GHS",
+      "GTQ",
+      "HKD",
+      "HNL",
+      "HRK",
+      "HUF",
+      "IDR",
+      "ILS",
+      "INR",
+      "IQD",
+      "IRR",
+      "ISK",
+      "JMD",
+      "JOD",
+      "JPY",
+      "KES",
+      "KGS",
+      "KRW",
+      "KZT",
+      "LBP",
+      "LKR",
+      "MAD",
+      "MDL",
+      "MMK",
+      "MNT",
+      "MOP",
+      "MUR",
+      "MVR",
+      "MXN",
+      "MYR",
+      "MZN",
+      "NGN",
+      "NIO",
+      "NOK",
+      "NPR",
+      "NZD",
+      "PAB",
+      "PEN",
+      "PHP",
+      "PKR",
+      "PLN",
+      "PYG",
+      "QAR",
+      "RON",
+      "RSD",
+      "RUB",
+      "SAR",
+      "SEK",
+      "SGD",
+      "SYP",
+      "THB",
+      "TJS",
+      "TRY",
+      "TTD",
+      "TWD",
+      "TZS",
+      "UAH",
+      "UGX",
+      "USD",
+      "UYU",
+      "UZS",
+      "VND",
+      "YER",
+      "ZAR"
+    ],
     "temporary.delete_after_unit": [
+      "seconds",
+      "minutes",
+      "hours",
+      "days"
+    ],
+    "invoice_stars.timeout_unit": [
+      "seconds",
+      "minutes",
+      "hours",
+      "days"
+    ],
+    "invoice_card.timeout_unit": [
+      "seconds",
+      "minutes",
+      "hours",
+      "days"
+    ],
+    "channel_access.term_unit": [
+      "seconds",
+      "minutes",
+      "hours",
+      "days"
+    ],
+    "channel_access.warn_unit": [
       "seconds",
       "minutes",
       "hours",
@@ -279,6 +458,31 @@
     "navigation.message_mode": [
       "resend",
       "clear_history"
+    ],
+    "ask_text.timeout_unit": [
+      "seconds",
+      "minutes",
+      "hours"
+    ],
+    "ask_contact.timeout_unit": [
+      "seconds",
+      "minutes",
+      "hours"
+    ],
+    "ask_location.timeout_unit": [
+      "seconds",
+      "minutes",
+      "hours"
+    ],
+    "ask_file.timeout_unit": [
+      "seconds",
+      "minutes",
+      "hours"
+    ],
+    "ask_voice.timeout_unit": [
+      "seconds",
+      "minutes",
+      "hours"
     ]
   },
   "safe_expr": {
