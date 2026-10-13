@@ -28,9 +28,10 @@ One JSON document describes one or more flows of a bot. The installer, the expor
 | `format` | always `"lanka-flows/v1"` |
 | `title`, `description` | free text, for people |
 | `params` | names of `{{placeholders}}` the caller must supply (besides the built-ins) |
-| `requires.plugins` | plugin ids the flows need (`catalog`, `schedule`) — informational |
+| `mini_apps` | the Mini App kinds the flows open (`shop`, `calendar`, `week`), created in the write's data space unless the bot has them there (mini-apps.md) |
 | `seed_app_variables` | `app.*` keys with initial values, written only where the bot has none. A key is one top-level name, never a path: `{"veres": {"squad": …}}` is read as `app.veres.squad`; `{"veres.squad": …}` stores a variable literally named `veres.squad`, which no token or script can reach |
 | `seed_audiences` | audiences the flows send to: `[{"key", "name", "filters": [{"field", "operator", "value"}]}]`, created on install unless the bot already has one of that name (then the owner's is used as is) |
+| `panels` | the owner's pages over the flows' data — a Storefront, a Schedule or a table: `[{"key", "title", "icon", "definition"}]` (data.md § Panels). Created on install unless the bot has one of that key; a document written to drafts replaces it. An action names its flow by `"flow": "<key>"` |
 | `flows` | the flows, in order |
 
 ## Flow
@@ -110,14 +111,14 @@ Inside `content`: `target_flow` (navigation `start_flow`) and `notify_flow` (not
 
 ### Placeholders
 
-`{{site_url}}` — this Lanka host; `{{bot.username}}`, `{{bot.public_key}}`; `{{owner_chat}}` — the owner's Telegram id (for `notify` → `target_chat_id`); `{{app_query}}` / `{{app_query_and}}` — `?scope=…` / `&scope=…` of the plugin instance, empty at the root instance; `{{flow.<key>}}` — the link key of a flow of this document, for deep links `t.me/{{bot.username}}?start={{flow.<key>}}-<data>`. Anything else must be listed in `params` and passed in the write body as `"params": {"name": "value"}`.
+`{{site_url}}` — this Lanka host; `{{bot.username}}`, `{{bot.public_key}}`; `{{owner_chat}}` — the owner's Telegram id (for `notify` → `target_chat_id`); `{{app_query}}` / `{{app_query_and}}` — `?scope=…` / `&scope=…` of the data space, empty in the main space; `{{flow.<key>}}` — the link key of a flow of this document, for deep links `t.me/{{bot.username}}?start={{flow.<key>}}-<data>`. Anything else must be listed in `params` and passed in the write body as `"params": {"name": "value"}`.
 
-Mini App url: `{{site_url}}/apps/<app>/{{bot.public_key}}{{app_query}}`.
+Mini App url: `{{site_url}}/apps/<kind>/{{bot.public_key}}{{app_query}}`.
 
 ## Write body
 
 ```json
-{ "document": { … }, "params": { "site_url": "…" }, "scope": "kiosk" }
+{ "document": { … }, "params": { "site_url": "…" }, "scope": "shafa" }
 ```
 
-`params.site_url` defaults to the Lanka host; `scope` defaults to the root instance.
+`params.site_url` defaults to the Lanka host; `scope` — the data space (data.md), the main one when left out.

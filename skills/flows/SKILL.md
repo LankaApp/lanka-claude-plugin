@@ -51,10 +51,14 @@ GET /api/v1/bots                       # [{id, name, platform, username, url}]
 GET /api/v1/bots/:bot_id/flows         # [{id, name, group, trigger_type, trigger_value, active, internal, draft_dirty, updated_at, editor_url}]
 GET /api/v1/bots/:bot_id/flows/export             # the whole bot as one document
 GET /api/v1/bots/:bot_id/flows/:flow_id/export    # one flow (+ the notification flows it fires)
-GET /api/v1/bots/:bot_id/mini_apps                # the Mini Apps this bot's plugins offer, with their contracts
+GET /api/v1/bots/:bot_id/mini_apps                # the bot's Mini Apps by data space, with their urls and contracts (references/mini-apps.md)
 POST /api/v1/bots/:bot_id/uploads              # body {"url": "https://…/photo.jpg"} (or multipart file) → {url}: the picture copied into the bot's media — put THAT url into media_url or a catalog item, never the foreign one
 GET /api/v1/bots/:bot_id/app/:key?scope=       # one app.* value → {key, scope, value, version}
 PUT /api/v1/bots/:bot_id/app/:key              # body {"value": …, "version": "…"} — replaces it; 409 when version is stale
+GET /api/v1/bots/:bot_id/panels                # the owner's pages over app.* (Storefront, Schedule, tables) → {panels: [{key, title, icon, scope, definition}]}
+POST /api/v1/bots/:bot_id/panels               # body {"panel": {key, title, icon?, scope?, definition}} — a new table panel (references/data.md § Panels)
+PUT /api/v1/bots/:bot_id/panels/:key           # the same body — replaces title/icon/definition
+DELETE /api/v1/bots/:bot_id/panels/:key
 ```
 
 `app.*` is live data, not a draft: a `PUT` reaches visitors at once. Read it freely; write it only when the owner asks for that very change, and say what the value becomes.
@@ -67,7 +71,13 @@ When several bots exist and the request does not say which, ask. When a request 
 
 ## 2. Author or edit
 
-Write a `lanka-flows/v1` document. The format is in [references/format.md](references/format.md); node types and their `content` keys in [references/node-types.md](references/node-types.md); scripts in [references/safe-expr.md](references/safe-expr.md); hosted Mini Apps in [references/mini-apps.md](references/mini-apps.md); plugins and their `app.*` data in [references/plugins.md](references/plugins.md). [references/generated.json](references/generated.json) is generated from Lanka's code — the exact node types, slots, enums and script functions; when a prose page and it disagree, it is right. The export of the user's own bot is your worked example.
+### Templates first
+
+For a booking, a shop or a paid private channel, offer the owner the template before building anything: «Шаблони» in the editor's top bar installs ready flows with a short wizard — «Запис на час» (calendars, reminders, moving and cancelling a visit), «Магазин» (Storefront, cart, orders), «Закритий клуб» (payment, channel access for a term, renewal reminders). Installed a second time under another name, a template gets its own data space. Build by hand what no template covers, or adapt the flows a template installed — export them like any other.
+
+### The document
+
+Write a `lanka-flows/v1` document. The format is in [references/format.md](references/format.md); node types and their `content` keys in [references/node-types.md](references/node-types.md); scripts in [references/safe-expr.md](references/safe-expr.md); hosted Mini Apps in [references/mini-apps.md](references/mini-apps.md); `app.*` data, data spaces and panels in [references/data.md](references/data.md). [references/generated.json](references/generated.json) is generated from Lanka's code — the exact node types, slots, enums and script functions; when a prose page and it disagree, it is right. The export of the user's own bot is your worked example.
 
 Rules that are easy to get wrong:
 
@@ -80,7 +90,7 @@ Rules that are easy to get wrong:
 - HTTP inside a flow is `fetch(...)` in a `script` node — there is no api_call node. A fetch result needs a home: `temp.r = fetch(...)` or `session.r = fetch(...)`.
 - Slots are the type's: `answer`/`timeout` on the `ask_*` steps, `next`/`paid`/`timeout` on `invoice_stars` and `invoice_card`, `next`/`expiring`/`expired`/`failed` on `channel_access`, `yes`/`no` on `condition` and `check_subscription`, `next`/`error` on `script`, `next`/`error`/`hooks` on `web_app`, `next`/`no_images` on `album`, `branches` on `switch`, `next` everywhere else. Anything else is refused.
 - Placeholders: `{{site_url}}`, `{{bot.username}}`, `{{bot.public_key}}`, `{{owner_chat}}`, `{{app_query}}` — use them in URLs and deep links instead of literal hosts and keys. Declare extra params in `"params"` and pass them in the write body.
-- Working inside a plugin instance (its data lives under `app.<scope>.*`)? Write `app.*` in scripts and pass `scope` in the body — the server re-roots it.
+- Working inside a data space (its data lives under `app.<scope>.*`)? Write `app.*` in scripts and pass `scope` in the body — the server re-roots it.
 - `seed_app_variables` keys are top-level names, nested with objects: `{"veres": {"squad": …}}` → `app.veres.squad`. A dotted key (`"veres.squad"`) becomes a variable literally named so, and every `app.veres.*` token renders empty.
 - Message text goes in `paragraphs` (plain strings, Telegram HTML allowed: `<b>`, `<i>`, `<code>`, `<a href>`); tokens `###user.name###` render the visitor's variables. Paragraphs are separated by an empty line. For lines with no gap between them (a list, a table of routes) never put `\n` inside a paragraph — the editor drops it the first time the owner saves the node and the lines run together. Write `content.html` with adjacent `<p>`s instead (format.md).
 - `seed_app_variables` land when the draft is written, not when it is published, and only where the key is missing — a second write never replaces them.

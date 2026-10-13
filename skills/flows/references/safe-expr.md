@@ -6,7 +6,8 @@ Scripts run in `script` nodes and Mini App actions. A script is **assignment sta
 # a comment is a whole line starting with #
 week = default(week, 0)
 week_start = add_days(platform.now, week * 7)
-free = filter(app.slots, item.status == "free" && item.date >= week_start)
+calendar = find(app.calendars, item.id == calendar_id)
+free = filter(calendar.slots, item.status == "free" && item.date >= week_start)
 day_labels = map(free, format(item.date, "dd.MM"))
 user.visits = default(user.visits, 0) + 1
 temp.resp = fetch("https://api.example.com/slots", {method: "POST", body: {date: week_start}, timeout: 10})
@@ -17,9 +18,10 @@ slots = temp.resp.status == 200 ? temp.resp.body.slots : []
 
 - One statement per line: `target = expression`. A statement may continue on following lines while a bracket is open. No inline comments (`x = 1 # no`).
 - Literals: numbers, `"strings"`, `true`/`false`/`null`, `[a, b]`, `{key: value}` (explicit keys only). Max 50 elements/keys per literal.
+- Template strings: `` `${item.name} ×${item.qty}` `` — any expression inside `${…}`, spelled out as `str()` would; `null`/unset fills in as `""`. The readable way to build text per item: `join(map(record.items, `${item.name} ×${item.qty}`), "\n")`.
 - Operators: `+ - * / %`, `> < >= <= == !=`, `&& || !`, `cond ? a : b`. `==` is strict (`1 == "1"` is false). `+` concatenates when either side is a string, otherwise both must be numbers.
 - Indexing: `items[0]` or `items.0` — literal non-negative integers only. `list.size` / `object.size`.
-- **No lambdas.** `filter`, `map`, `flat_map`, `find`, `update_where` take a plain expression as their second argument, evaluated per element with `item` bound: `filter(app.slots, item.status == "free")`. A collection call cannot be nested inside another's predicate.
+- **No lambdas.** `filter`, `map`, `flat_map`, `find`, `update_where` take a plain expression as their second argument, evaluated per element with `item` bound: `filter(app.orders, item.status == "new")`. A collection call cannot be nested inside another's predicate.
 - Reading an unset name gives `null` — use `default(x, fallback)` / `is_null(x)`.
 - Limits: 50 statements, 4096 chars per script, 1024 chars per expression, paths ≤5 segments after the namespace, lists ≤500 items.
 
@@ -29,7 +31,7 @@ slots = temp.resp.status == 200 ? temp.resp.body.slots : []
 |---|---|---|
 | `name = …` (bare) or `session.name = …` | the conversation (dies with it) | `name`, `session.name` |
 | `user.name = …` | forever, per visitor | `user.name` |
-| `app.name = …` | forever, bot-wide (plugin data lives here) | `app.name` |
+| `app.name = …` | forever, bot-wide (panels show and edit it) | `app.name` |
 | `temp.name = …` | this script only | `temp.name` |
 | `platform.*` | read-only: `user_id`, `first_name`, `last_name`, `full_name`, `username`, `language_code`, `is_premium`, `message_text`, `start_param`, `now` (ISO timestamp). `message_text` and `start_param` belong to the message being handled: `start_param` is the data after the dash of a deep link, only while that `/start` is handled — the conversation it opened keeps it as `session.start_param` | |
 | `initiator.*` | read-only, inside an internal notification flow: the visitor who fired it | |
