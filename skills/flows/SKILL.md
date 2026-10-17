@@ -30,9 +30,18 @@ Responses are JSON. `401` — the key is wrong or revoked; `403` — the account
 Every open bot page is a **session** with a sayable name (the Claude chip in the editor shows it, e.g. `тихий-кіт`); it lives as long as the tab stays on that bot, whichever page of it is open. Given as the skill's argument (`/lanka:flows тихий-кіт`) or mentioned by the user, **keep it for the whole chat**: pass it as `?session=` when reading the context and as `"session"` in every write, so what you write lands on that page and nowhere else.
 
 ```bash
-GET /api/v1/context?session=тихий-кіт   # {open: {session, bot: {id, name}, page, flow: {id, name, group, draft_dirty, editor_url} | null, node_id, seen_at, stale, session_variables}, sessions: [{session, bot, page, flow, focused_at}]}
+GET /api/v1/context?session=тихий-кіт   # {open: {session, bot: {id, name}, page, flow: {id, name, group, draft_dirty, editor_url} | null, node_id, seen_at, stale, session_variables}, sessions: [{session, bot, page, flow, focused_at}], skill: {digest}}
 GET /api/v1/context                     # without a name: the page focused most recently, and the other live pages
 ```
+
+**Is this skill current?** `skill.digest` is the digest of what Lanka's code allows now; `digest` at the top of [references/generated.json](references/generated.json) is what this copy knows. When they differ, Lanka has steps, slots or functions this copy does not describe: tell the user once, at the start, and go on with the task.
+
+```bash
+claude plugin marketplace update lanka
+claude plugin update lanka@lanka
+```
+
+Then a new Claude Code session picks up the update.
 
 When `open` is present and not `stale`, that bot and flow are what "here", "this flow", "add a button" refer to — do not ask which bot. `flow` is `null` while the tab is on another page of the bot (`page` says which: `broadcasts`, `users`, …) — then "here" is the bot, and "this flow" needs a name; a write or a look takes the tab into the editor by itself. `node_id` is the node the owner selected; `session_variables` are the names the flow's group already uses. With no session name: one live page in `sessions` — take it; several — ask which one, by name. Either way, from then on that page's name is your session for the chat.
 
@@ -59,6 +68,9 @@ GET /api/v1/bots/:bot_id/panels                # the owner's pages over app.* (S
 POST /api/v1/bots/:bot_id/panels               # body {"panel": {key, title, icon?, scope?, definition}} — a new table panel (references/data.md § Panels)
 PUT /api/v1/bots/:bot_id/panels/:key           # the same body — replaces title/icon/definition
 DELETE /api/v1/bots/:bot_id/panels/:key
+GET /api/v1/bots/:bot_id/broadcasts            # the bot's broadcasts, latest first, each with its editor_url
+POST /api/v1/bots/:bot_id/broadcasts           # body {"broadcast": {name, audience, audience_ids | audiences, target_chat_ids, flow_id | document, params, send_at_local, time_zone}} — a DRAFT; nothing is sent or scheduled
+PATCH /api/v1/bots/:bot_id/broadcasts/:id      # the same body, a draft only; DELETE removes a draft (two steps, §5)
 ```
 
 `app.*` is live data, not a draft: a `PUT` reaches visitors at once. Read it freely; write it only when the owner asks for that very change, and say what the value becomes.
@@ -71,9 +83,18 @@ When several bots exist and the request does not say which, ask. When a request 
 
 ## 2. Author or edit
 
-### Templates first
+### Know what Lanka already does — advise first
 
-For a booking, a shop or a paid private channel, offer the owner the template before building anything: «Шаблони» in the editor's top bar installs ready flows with a short wizard — «Запис на час» (calendars, reminders, moving and cancelling a visit), «Магазин» (Storefront, cart, orders), «Закритий клуб» (payment, channel access for a term, renewal reminders). Installed a second time under another name, a template gets its own data space. Build by hand what no template covers, or adapt the flows a template installed — export them like any other.
+The owner builds a bot, not a flow. When a request is served by a part Lanka already has, say so and point at it before building anything by hand; when the part is the owner's to set up (there is no API for it), say where and what to put there. Name the part, what it would do here, and its page — `$LANKA_API_URL/bots/<bot_id>/<path>`. Suggest; never build a part unasked.
+
+- **Templates** (`templates`) — for a booking, a shop, a paid private channel or a live feed, offer the template first: it installs ready flows with a short wizard. «Запис на час» (calendars, reminders, moving and cancelling a visit), «Магазин» (Storefront, cart, orders), «Закритий клуб» (payment, channel access for a term, renewal reminders), «Ефір» (what the owner posts goes to the subscribers). Installed a second time under another name, a template gets its own data space. Build by hand what no template covers, or adapt the flows a template installed — export them like any other.
+- **Broadcasts** (`broadcasts`) — a message or a whole flow to audiences, now or at a set time, with its stats. You may write a broadcast draft through the API; sending it stays with the owner.
+- **Audiences** (`audiences`) — visitors grouped by their variables; a broadcast, a job or a visitors table reaches them.
+- **Visitors** (`users`) — everyone who wrote to the bot, as a table with export to XLSX/CSV.
+- **Data and panels** (`variables`, `panels/<key>`) — `app.*` and the visitors' defaults; a panel is the owner's table over an `app.*` list, with status columns and actions (references/data.md).
+- **Jobs** (`jobs`) — a script on a schedule: over the shared data (refresh a list from another service every night) or for each visitor of some audiences, then a flow (a morning reminder). The owner sees each run and hears when one fails. There is no API for jobs: write the script, and tell the owner to create the job and paste it.
+- **Payments** (`payments`) — Telegram Stars and card invoices, the `invoice_stars` / `invoice_card` steps.
+- **Steps that save building** — channel access for a term, `remind`, `copy_message` (a visitor's message passed on as it is), `notify` (to the owner or a chat), `announce`, `ask_date` with its calendar: references/node-types.md.
 
 ### The document
 
@@ -82,6 +103,7 @@ Write a `lanka-flows/v1` document. The format is in [references/format.md](refer
 Rules that are easy to get wrong:
 
 - **Editing an existing flow: keep `id` on the flow and on every node you keep.** A node with its `id` keeps its identity when the owner publishes (buttons already sent to visitors keep working); a node without one is new. Drop the `id` only for nodes you replace on purpose. Keep `draft_version` as exported.
+- **A node keeps its type, or gets a kindred one.** Change `type` only between steps that are the same thing in another form: a `message` and a `reply_keyboard`, the `ask_*` steps among themselves, `invoice_stars` and `invoice_card`. Any other change — a message turned into a `navigation`, a `script` into a `condition` — is a new step: drop the old node and write the new one without its `id`. A sent button points at the node it hangs on, not at the step under it, so nothing a visitor holds breaks; and the owner's review reads «removed / added» instead of a message that became a jump.
 - **Mark where to look.** Put `"focus": true` on the node the owner should land on (the one you added or changed most) — their editor jumps to it the moment the draft is written.
 - **New dialog: write it whole.** A new flow, or several that belong together (a menu and the flows its buttons start), goes in one document — half a dialog is not reviewable. **Existing flow: one change per write** — the owner watches the editor; do not rewrite a bot to add a button.
 - **A very long flow is easier to keep as several.** When a flow you read or are asked to grow has grown past what fits in one look (dozens of steps, several independent stretches — a catalog, a checkout, a FAQ), **suggest** splitting it into flows by meaning, joined by `navigation` `start_flow` and kept in one `group`; session variables carry across the jump. Say where you would cut and why, and wait for a yes — never split on your own initiative, and never as a side effect of another change. Do not suggest it for a flow that reads in one screen: one idea per flow, not one flow per step.
@@ -113,7 +135,15 @@ source ~/.lanka/config && curl -sS -X POST -H "Authorization: Bearer $LANKA_API_
 - Always `validate` first. It runs every check the write runs and keeps nothing. On `422`, fix what `error` names and validate again — do not retry the same document.
 - `draft` answers `{flows: [{id, key, action: created|updated, name, editor_url}]}`. A flow named by its `id` had its draft replaced; a flow without one was created (nothing live until published).
 - `409` means the owner changed the draft in the editor since your export. **Export again, redo your change on the fresh `root`, write again.** Never force it.
-- After a successful write the page tied to the session updates by itself and jumps to the focused node; a write to another flow of the bot switches that page there. Give the `editor_url` anyway and say what to look at, then: *«перевір у редакторі й опублікуй»*. That is the end of your job — publishing is theirs.
+- After a successful write the page tied to the session updates by itself and jumps to the focused node; a write to another flow of the bot switches that page there. Give the `editor_url` anyway and say what to look at.
+- **When the task is done** — its last draft written, not after each write — open the review on the owner's page, then say: *«перевір і опублікуй»*. That is the end of your job — publishing is theirs.
+
+  ```bash
+  POST /api/v1/context/review   # body: {"session": "тихий-кіт"} → {session, unpublished: [{id, name}]}
+  ```
+
+  The page opens one dialog with every unpublished flow of the bot, step by step, each publishable on its own or all at once.
+- **Anything you changed besides flows is live already** — an `app.*` value, a panel, a Mini App, an upload, a broadcast draft — and the review does not show it. List each such change in your answer with a link to where the owner sees it: a panel `$LANKA_API_URL/bots/<bot_id>/panels/<key>`, the data `…/variables`, a broadcast the `editor_url` its answer gave.
 
 ## 4. Copying flows between bots
 
