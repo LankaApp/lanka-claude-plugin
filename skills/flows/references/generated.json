@@ -1,4 +1,5 @@
 {
+  "digest": "fd0539c84f18",
   "format": "lanka-flows/v1",
   "placeholders": [
     "bot.username",
@@ -232,6 +233,13 @@
       "series": {},
       "button_kind": false
     },
+    "copy_message": {
+      "slots": {
+        "next": 0
+      },
+      "series": {},
+      "button_kind": false
+    },
     "ask_text": {
       "slots": {
         "answer": 0,
@@ -271,6 +279,14 @@
       },
       "series": {},
       "button_kind": false
+    },
+    "ask_date": {
+      "slots": {
+        "answer": 0,
+        "timeout": 1
+      },
+      "series": {},
+      "button_kind": false
     }
   },
   "enums": {
@@ -296,6 +312,14 @@
       "any",
       "photo",
       "document"
+    ],
+    "ask_text.accept": [
+      "text",
+      "any"
+    ],
+    "copy_message.audience": [
+      "visitors",
+      "chats"
     ],
     "delay.delay_unit": [
       "seconds",
@@ -480,6 +504,11 @@
       "hours"
     ],
     "ask_voice.timeout_unit": [
+      "seconds",
+      "minutes",
+      "hours"
+    ],
+    "ask_date.timeout_unit": [
       "seconds",
       "minutes",
       "hours"
