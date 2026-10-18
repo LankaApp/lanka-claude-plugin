@@ -1,0 +1,244 @@
+openapi: 3.1.0
+info:
+  title: Lanka flows
+  version: 0.1.0
+  description: Read a Lanka bot's flows and write drafts the owner publishes in the editor.
+servers:
+  - url: https://lanka.bot/api/v1
+paths:
+  /context:
+    get:
+      operationId: getContext
+      summary: The editor page the owner has open (by its session name, or the most recently focused one) and the other live pages.
+      parameters:
+        - name: session
+          in: query
+          required: false
+          description: The session name shown in the editor's chip, e.g. тихий-кіт. Keep it for the whole chat.
+          schema: { type: string }
+      responses:
+        "200":
+          description: "{open: {session, bot: {id, name}, flow: {id, name, group, draft_dirty, editor_url}, node_id, stale, session_variables}, sessions: [...]}"
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+  /context/look:
+    post:
+      operationId: lookAt
+      summary: Take the owner's editor page to a flow (and node). Only when the owner asks to go somewhere; writes nothing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [session, flow_id]
+              properties:
+                session: { type: string }
+                flow_id: { type: integer }
+                node_id: { type: integer }
+      responses:
+        "200":
+          description: "{session, flow: {id, name, editor_url}, node_id}"
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+  /bots:
+    get:
+      operationId: listBots
+      summary: The owner's bots.
+      responses:
+        "200":
+          description: "[{id, name, platform, username, url}]"
+          content:
+            application/json:
+              schema: { type: array, items: { type: object, additionalProperties: true } }
+  /bots/{bot_id}/flows:
+    get:
+      operationId: listFlows
+      summary: A bot's flows with ids, names, groups, triggers and whether each has unpublished changes.
+      parameters:
+        - $ref: "#/components/parameters/BotId"
+      responses:
+        "200":
+          description: "[{id, name, group, trigger_type, trigger_value, active, internal, draft_dirty, updated_at, editor_url}]"
+          content:
+            application/json:
+              schema: { type: array, items: { type: object, additionalProperties: true } }
+  /bots/{bot_id}/flows/{flow_id}/export:
+    get:
+      operationId: exportFlow
+      summary: One flow (plus the notification flows it fires) as a lanka-flows/v1 document. Prefer this to exporting the whole bot.
+      parameters:
+        - $ref: "#/components/parameters/BotId"
+        - name: flow_id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: "{document, warnings}"
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+  /bots/{bot_id}/flows/export:
+    get:
+      operationId: exportBot
+      summary: Every flow of the bot as one document. Large bots may exceed the response limit; export flows one by one then.
+      parameters:
+        - $ref: "#/components/parameters/BotId"
+      responses:
+        "200":
+          description: "{document, warnings}"
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+  /bots/{bot_id}/mini_apps:
+    get:
+      operationId: listMiniApps
+      summary: The Mini Apps this bot's plugins offer, with their contracts.
+      parameters:
+        - $ref: "#/components/parameters/BotId"
+      responses:
+        "200":
+          description: Mini Apps
+          content:
+            application/json:
+              schema: { type: array, items: { type: object, additionalProperties: true } }
+  /bots/{bot_id}/app/{key}:
+    get:
+      operationId: getAppValue
+      summary: Read one app.* value of the bot (plugin data, lists a flow keeps) with its version.
+      parameters:
+        - $ref: "#/components/parameters/BotId"
+        - name: key
+          in: path
+          required: true
+          description: A top-level app.* name, e.g. catalog for app.catalog.
+          schema: { type: string }
+        - name: scope
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: "{key, scope, value, version}"
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+    put:
+      operationId: putAppValue
+      summary: Replace one app.* value. Live at once — no draft. Only on the owner's explicit request, after showing what changes. 409 = changed meanwhile, read again.
+      x-openai-isConsequential: true
+      parameters:
+        - $ref: "#/components/parameters/BotId"
+        - name: key
+          in: path
+          required: true
+          schema: { type: string }
+        - name: scope
+          in: query
+          required: false
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [value, version]
+              properties:
+                value:
+                  description: The whole new value — lists are replaced, not merged.
+                version:
+                  type: string
+                  description: The version getAppValue returned; the write is refused if the value changed since.
+      responses:
+        "200":
+          description: "{key, scope, value, version}"
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+  /bots/{bot_id}/uploads:
+    post:
+      operationId: uploadImage
+      summary: Copy a picture from a public URL into the bot's media. Use the returned url in media_url, never the foreign one.
+      parameters:
+        - $ref: "#/components/parameters/BotId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url]
+              properties:
+                url: { type: string }
+      responses:
+        "201":
+          description: "{url}"
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+  /bots/{bot_id}/flows/validate:
+    post:
+      operationId: validateDocument
+      summary: Run every check a draft write runs, keeping nothing. Always call before writeDraft; on 422 fix what error names.
+      parameters:
+        - $ref: "#/components/parameters/BotId"
+      requestBody:
+        $ref: "#/components/requestBodies/Write"
+      responses:
+        "200":
+          description: "{flows: [{key, action, name}]}"
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+  /bots/{bot_id}/flows/draft:
+    post:
+      operationId: writeDraft
+      summary: Write the document into the flows' drafts; the owner reviews and publishes in the editor. 409 = the draft changed, export again.
+      parameters:
+        - $ref: "#/components/parameters/BotId"
+      requestBody:
+        $ref: "#/components/requestBodies/Write"
+      responses:
+        "200":
+          description: "{flows: [{id, key, action, name, editor_url}]}"
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+  parameters:
+    BotId:
+      name: bot_id
+      in: path
+      required: true
+      schema: { type: integer }
+  requestBodies:
+    Write:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [document]
+            properties:
+              document:
+                type: object
+                additionalProperties: true
+                description: A lanka-flows/v1 document (format.md in the knowledge files).
+              session:
+                type: string
+                description: The editor session name, so the owner's page updates and jumps to the focused node.
+              params:
+                type: object
+                additionalProperties: true
+              scope:
+                type: string
+security:
+  - bearer: []
