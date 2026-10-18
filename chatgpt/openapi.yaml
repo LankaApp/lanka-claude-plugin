@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Lanka flows
-  version: 0.1.0
+  version: 0.2.0
   description: Read a Lanka bot's flows and write drafts the owner publishes in the editor.
 servers:
   - url: https://lanka.bot/api/v1
@@ -40,6 +40,26 @@ paths:
       responses:
         "200":
           description: "{session, flow: {id, name, editor_url}, node_id}"
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+  /context/review:
+    post:
+      operationId: openReview
+      summary: Open the review of every unpublished flow on the owner's editor page. Call once, when the task's last draft is written.
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [session]
+              properties:
+                session: { type: string }
+      responses:
+        "200":
+          description: "{session, unpublished: [{id, name}]}"
           content:
             application/json:
               schema: { type: object, additionalProperties: true }
@@ -210,9 +230,16 @@ paths:
               schema: { type: object, additionalProperties: true }
 components:
   securitySchemes:
-    bearer:
-      type: http
-      scheme: bearer
+    oauth2:
+      type: oauth2
+      description: Lanka OAuth 2.1 (PKCE S256). Access tokens live 1 hour and are refreshed with the rotating refresh token.
+      flows:
+        authorizationCode:
+          authorizationUrl: https://lanka.bot/oauth/authorize
+          tokenUrl: https://lanka.bot/oauth/token
+          refreshUrl: https://lanka.bot/oauth/token
+          scopes:
+            bots: read flows, write drafts, read and write app data
   parameters:
     BotId:
       name: bot_id
@@ -241,4 +268,4 @@ components:
               scope:
                 type: string
 security:
-  - bearer: []
+  - oauth2: [bots]
