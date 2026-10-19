@@ -72,7 +72,7 @@ One JSON document describes one or more flows of a bot. The installer, the expor
 | `name` | the node's name in the editor; a button child's name usually equals the button text |
 | `id` | the live node this node stands for (from an export) — keeps its identity on publish |
 | `focus` | `true` on one node: where the owner's editor lands after the write |
-| `paragraphs` | the message body: one string per paragraph, Telegram HTML inside; paragraphs are joined with an empty line. Alternatively `content.html` + `content.text` verbatim — see *Lines without a gap* |
+| `paragraphs` | the message body: one string per paragraph, Telegram HTML inside; paragraphs are joined with an empty line. Alternatively `content.html` + `content.text` verbatim — see *Lines without a gap*. A rich text has `content.blocks` instead — see *Buttons inside a rich text* |
 | `content` | type-specific keys (node-types.md). Strings may carry `{{placeholders}}` and `###tokens###` |
 | `buttons` | keyboard rows: an entry is one button `{text, node?}` on its own row, or an array — one row of several. A button's `node` is what happens on tap: a step, or a *button kind* (`url`, `web_app`, `share`, `copy_text`, `list_buttons`), or a `visibility` node with the kind under it |
 | slots | one child per slot the type has — see below |
@@ -104,6 +104,28 @@ A slot the type does not have is refused: *"message «Hi» has no error slot"*.
 ```
 
 Never `\n` inside a paragraph: it sends fine, but the editor drops it the moment the owner saves the node, and the lines run together. `<br>` survives the editor, but adjacent `<p>`s are what the owner's own lines look like.
+
+### Buttons inside a rich text
+
+A `message` with `content.format: "rich"` keeps its body in `content.blocks` (node-types.md § Rich text). Its buttons can sit inside the text: a `{"type": "button", "button": {…}}` part of a text, or a `{"type": "buttons", "buttons": [{…}, …]}` row. Each such button has `text` and either `url` or `node`. The `node` is the step a tap opens, written like any other node. A button with neither is refused.
+
+```json
+"content": {
+  "format": "rich",
+  "blocks": [
+    { "type": "heading", "size": 1, "text": "Довідка" },
+    { "type": "paragraph", "text": "Оберіть розділ:" },
+    { "type": "buttons", "buttons": [
+      { "text": "Кроки", "node": { "type": "message", "name": "Кроки", "paragraphs": ["…"] } },
+      { "text": "Сайт", "url": "{{site_url}}" }
+    ] }
+  ]
+}
+```
+
+An export gives the step back as the button's `node`, with its `id`. Keep that `id` when you write the document back: the button then keeps its own id too, and messages already sent still open the step. A button whose step was deleted in the editor is left out of the export, with a warning.
+
+Buttons in the text make the step wait for a tap, like a keyboard does: a `next` on it never runs. Keyboard `buttons` under a rich message work as usual.
 
 ### Cross-flow references
 
