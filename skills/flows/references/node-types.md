@@ -53,6 +53,29 @@ A rule is `{variable_name, operator, compare_value}`. `groups` is a list of grou
 | `location` | `point` (`"lat, lng"`, or a lone token whose variable holds that text, `[lat, lng]` or `{lat, lng}` / `{latitude, longitude}`), `title`, `address` (plain text, tokens ok) | A point on the map: a venue (map with the title and the address) when both `title` and `address` are set, a bare location otherwise. A value that is no point on Earth sends nothing. No keyboard: buttons go on the node after it. Continues to `next`. |
 | `remind` | `base` (a variable holding a date/time; blank = now), `offset_value`, `offset_unit` ∈ `minutes` `hours` `days`, `offset_direction` ∈ `before` `after`, `interrupt_level` ∈ `when_free` (default) `urgent` | Schedules the body as a message at base ± offset and continues **immediately**. A moment in the past is skipped. `when_free`: a visitor mid-conversation at that moment gets it once they go quiet; `urgent`: right then. |
 
+### Rich text — `message`
+
+`content.format: "rich"` sends the body as one Telegram rich message of up to 32 768 characters. Headings, lists, tables, quotes, code, photos and buttons sit inside the text. The body is then `content.blocks`, not `paragraphs`. A rich message takes no `media_url`: a photo goes in as a block. `content.text` is the plain text the editor fills in; a write may leave it out.
+
+The blocks the editor keeps. Any other block is lost when the owner next saves the step.
+
+| block | keys |
+|---|---|
+| `paragraph` | `text` |
+| `heading` | `text`, `size` 1–3 |
+| `list` | `items: [{"blocks": […]}]`. A numbered list gives every item `"type": "1"` and `value`, its number |
+| `blockquote` | `blocks` |
+| `pre` | `text` (plain, no formatting), `language` |
+| `table` | `is_bordered: true`, `cells`: rows of `{text, align: "left", valign: "top"}`, plus `is_header`, `colspan`, `rowspan` where needed |
+| `buttons` | `buttons: [{text, url or node, style?}]`, up to 8. `align` ∈ `left` `center` `right`; without it the buttons share the row's width |
+| `divider` | — |
+| `photo`, `video`, `document` | the file by url: `{"type": "photo", "photo": {"type": "photo", "media": "https://…"}}` |
+| `collage`, `slideshow` | `blocks`: photo and video blocks |
+
+A `text` is a string or a part. A part is `{type, text}` with type ∈ `bold` `italic` `underline` `strikethrough` `code` `spoiler`, a link `{"type": "url", "text", "url"}`, or a button `{"type": "button", "button": {…}}`. An array of strings and parts is one text. Parts nest: `{"type": "bold", "text": {"type": "italic", "text": "…"}}`. A line break is `\n` inside a string.
+
+A button leads to a `url` (`http(s)://` or `tg://`) or to a step, its `node` (format.md § Buttons inside a rich text). `style` ∈ `primary` `danger` `success`; a button with a `node` may also be `link`, drawn without a border. Tokens `###…###` and `{{placeholders}}` work in every text and url.
+
 ### Forbidding forwarding — `message`, `album`, `voice`, `temporary`
 
 `protect_content` (bool): the visitor can neither forward the message nor save its file. A protected step sends a fresh message rather than edit a carried-over or placeholder one.

@@ -5,7 +5,7 @@ description: Author, read and edit Lanka chatbot flows (ланки) through Lank
 
 # Lanka flows
 
-You work on a Lanka bot through the **`lanka` MCP server** (tools `mcp__plugin_lanka_lanka__*`: get_context, look, open_review, list_bots, list_flows, export_flows, validate_flows, write_draft, discard_draft, delete_flow, get_app_value, put_app_value, delete_app_variable, list_mini_apps, upload_by_url, list_panels, save_panel, delete_panel, list_broadcasts, save_broadcast, delete_broadcast, guide). You **read** flows as `lanka-flows/v1` documents and **write drafts**; the owner publishes in the Lanka editor. You never publish, and nothing you write reaches visitors until they do.
+You work on a Lanka bot through the **`lanka` MCP server** (tools `mcp__plugin_lanka_lanka__*`: get_context, look, open_review, list_bots, list_flows, export_flows, validate_flows, write_draft, discard_draft, delete_flow, get_app_value, put_app_value, delete_app_variable, list_mini_apps, upload_by_url, list_panels, save_panel, delete_panel, list_channels, list_broadcasts, save_broadcast, delete_broadcast, guide). You **read** flows as `lanka-flows/v1` documents and **write drafts**; the owner publishes in the Lanka editor. You never publish, and nothing you write reaches visitors until they do.
 
 The server's own instructions carry the condensed workflow; this page adds the editor-page tie, what to advise before building, the references and the fallback without MCP. Where they disagree, the server is newer.
 
@@ -55,7 +55,8 @@ With nothing open, list the bots. Reading and live data:
 | one `app.*` value | `get_app_value {bot_id, key, scope?}` | `GET …/app/:key?scope=` → `{key, scope, value, version}` |
 | replace it | `put_app_value {bot_id, key, scope?, value, version}` | `PUT …/app/:key` — `409` when `version` is stale |
 | the owner's pages over `app.*` | `list_panels`, `save_panel {bot_id, panel: {key, title, icon?, scope?, definition}}`, `delete_panel` | `GET`, `POST`, `PUT …/panels/:key`, `DELETE …/panels/:key` (references/data.md § Panels) |
-| broadcasts, latest first, each with its `editor_url` | `list_broadcasts`, `save_broadcast {bot_id, id?, broadcast: {name, audience, audience_ids \| audiences, target_chat_ids, flow_id \| document, params, send_at_local, time_zone}}` | `GET`, `POST`, `PATCH …/broadcasts/:id` — a DRAFT; nothing is sent or scheduled |
+| the bot's linked channels and groups — where a channel post's `target_chat_ids` come from | `list_channels {bot_id}` | `GET …/channels` → `{channels: [{chat_id, title, username, chat_type, bot_is_admin, can_invite, can_ban}]}` |
+| broadcasts and channel posts, latest first, each with its `editor_url` (a post lives on the posts page) | `list_broadcasts {bot_id, audience?, page?}` (`audience`: `visitors` \| `channels`), `save_broadcast {bot_id, id?, broadcast: {name, audience, audience_ids \| audiences, target_chat_ids, flow_id \| document, params, send_at_local, time_zone}}` | `GET …/broadcasts?audience=`, `POST`, `PATCH …/broadcasts/:id` — a DRAFT; nothing is sent or scheduled |
 
 `app.*` is live data, not a draft: a `put_app_value` reaches visitors at once. Read it freely; write it only when the owner asks for that very change, and say what the value becomes.
 
