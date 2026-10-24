@@ -68,6 +68,7 @@ GET /api/v1/bots/:bot_id/panels                # the owner's pages over app.* (S
 POST /api/v1/bots/:bot_id/panels               # body {"panel": {key, title, icon?, scope?, definition}} — a new table panel (references/data.md § Panels)
 PUT /api/v1/bots/:bot_id/panels/:key           # the same body — replaces title/icon/definition
 DELETE /api/v1/bots/:bot_id/panels/:key
+GET /api/v1/bots/:bot_id/channels              # the bot's linked channels and groups → {channels: [{chat_id, title, username, chat_type, bot_is_admin, can_invite, can_ban}]}; chat_id strings go into a channel broadcast's target_chat_ids
 GET /api/v1/bots/:bot_id/broadcasts            # the bot's broadcasts, latest first, each with its editor_url
 POST /api/v1/bots/:bot_id/broadcasts           # body {"broadcast": {name, audience, audience_ids | audiences, target_chat_ids, flow_id | document, params, send_at_local, time_zone}} — a DRAFT; nothing is sent or scheduled
 PATCH /api/v1/bots/:bot_id/broadcasts/:id      # the same body, a draft only; DELETE removes a draft (two steps, §5)
