@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "lanka": {
+      "type": "http",
+      "url": "https://lanka.bot/mcp"
+    }
+  }
+}
