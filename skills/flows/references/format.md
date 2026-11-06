@@ -9,7 +9,7 @@ One JSON document describes one or more flows of a bot. The installer, the expor
   "params": ["site_url"],
   "flows": [
     {
-      "id": 42,
+      "id": "flow_Xk3mQ8pZ",
       "key": "booking",
       "name": "✂️ Запис",
       "group": "Салон",
@@ -29,7 +29,7 @@ One JSON document describes one or more flows of a bot. The installer, the expor
 | `title`, `description` | free text, for people |
 | `params` | names of `{{placeholders}}` the caller must supply (besides the built-ins) |
 | `mini_apps` | the Mini App kinds the flows open (`shop`, `calendar`, `week`), created in the write's data space unless the bot has them there (mini-apps.md) |
-| `seed_app_variables` | `app.*` keys with initial values, written only where the bot has none. A key is one top-level name, never a path: `{"veres": {"squad": …}}` is read as `app.veres.squad`; `{"veres.squad": …}` stores a variable literally named `veres.squad`, which no token or script can reach |
+| `seed_app_variables` | `app.*` keys with initial values, written only where the bot has none; they land on write, before anything is published. A key is one top-level name, never a path: `{"veres": {"squad": …}}` is read as `app.veres.squad`; `{"veres.squad": …}` stores a variable literally named `veres.squad`, which no token or script can reach |
 | `seed_audiences` | audiences the flows send to: `[{"key", "name", "filters": [{"field", "operator", "value"}]}]`, created on install unless the bot already has one of that name (then the owner's is used as is) |
 | `panels` | the owner's pages over the flows' data — a Storefront, a Schedule or a table: `[{"key", "title", "icon", "definition"}]` (data.md § Panels). Created on install unless the bot has one of that key; a document written to drafts replaces it. An action names its flow by `"flow": "<key>"` |
 | `flows` | the flows, in order |
@@ -39,11 +39,12 @@ One JSON document describes one or more flows of a bot. The installer, the expor
 | key | meaning |
 |---|---|
 | `key` | unique inside the document; how other flows refer to it (`target_flow`, `notify_flow`) |
-| `id` | the flow's id in this bot (from an export) — **update this flow's draft**. Absent or another bot's → a new flow |
+| `id` | the flow's key (`flow_…`, from an export or the flow list) — **update this flow's draft**. Absent or another bot's → a new flow; a string that is not a flow key is refused |
 | `draft_version` | as exported; required while that flow has a dirty draft, refused (409) if stale |
 | `name` | shown in the sidebar |
 | `group` | sidebar group |
-| `trigger` | `{type, value}`: `command` (`/book`), `text_match` (a phrase), or omit for a flow reached only from buttons |
+| `area` | `business` for a flow of the owner's own Telegram chats (Telegram Business); absent, the chats with the bot. Chosen when the flow is created, never changed: a write that names another area is refused |
+| `trigger` | `{type, value}`: `command` (`/book`), `text_match` (a phrase; of several that match, the flow higher in the list wins), `fallback` (no value: the text no command, phrase or button took; one active per bot and per area), or omit for a flow reached only from buttons |
 | `internal` | `true` for a notification flow that belongs to a `notify` node, hidden from lists |
 | `root` | the first node |
 | `published` | (export only) the live tree, when `root` came from a draft; ignored on write |
@@ -53,7 +54,7 @@ One JSON document describes one or more flows of a bot. The installer, the expor
 
 ```json
 {
-  "id": 1001,
+  "id": "node_7hRv2Lq9",
   "type": "message",
   "name": "Меню",
   "paragraphs": ["<b>Що робимо?</b>", "Оберіть:"],
@@ -68,29 +69,32 @@ One JSON document describes one or more flows of a bot. The installer, the expor
 
 | key | meaning |
 |---|---|
-| `type` | one of the node types (node-types.md) |
+| `type` | one of the node types (node-types.md). A node that keeps its `id` keeps its type, or takes a kindred one (`message` ↔ `reply_keyboard`, the `ask_*` steps among themselves, `invoice_stars` ↔ `invoice_card`); any other change is a new step without the old id |
 | `name` | the node's name in the editor; a button child's name usually equals the button text |
-| `id` | the live node this node stands for (from an export) — keeps its identity on publish |
+| `id` | the key of the live node this node stands for (`node_…`, from an export) — keeps its identity on publish; a node without an id is new; a string that is not a node key is refused |
 | `focus` | `true` on one node: where the owner's editor lands after the write |
 | `paragraphs` | the message body: one string per paragraph, Telegram HTML inside; paragraphs are joined with an empty line. Alternatively `content.html` + `content.text` verbatim — see *Lines without a gap*. A rich text has `content.blocks` instead — see *Buttons inside a rich text* |
-| `content` | type-specific keys (node-types.md). Strings may carry `{{placeholders}}` and `###tokens###` |
-| `buttons` | keyboard rows: an entry is one button `{text, node?}` on its own row, or an array — one row of several. A button's `node` is what happens on tap: a step, or a *button kind* (`url`, `web_app`, `share`, `copy_text`, `list_buttons`), or a `visibility` node with the kind under it |
+| `content` | the type's own fields, by its schema (generated.json → `node_types.<type>.content`: fields, types, required, defaults, an example; node-types.md explains them). An unknown field or a wrong type is refused, and so is a missing required field on a new node. Never a field borrowed from a kindred step: `check_subscription` checks one chat, `channel_chat_id`; `channel_access` and `channel_revoke` take a list, `channel_chat_ids`. Chat ids are strings. Strings may carry `{{placeholders}}` and `###tokens###` |
+| `buttons` | keyboard rows: an entry is one button `{text, node?}` on its own row, or an array — one row of several. A button's `node` is what happens on tap: a step, or a *button kind* (`url`, `web_app`, `share`, `copy_text`, `list_buttons`), or a `visibility` node with the kind under it. Options are a button whose child is a `list_buttons` node. The button kinds exist only under a button; a reply keyboard is the `reply_keyboard` node |
 | slots | one child per slot the type has — see below |
 
 ### Slots by type
 
 | type | slots |
 |---|---|
-| `ask_text`, `ask_contact`, `ask_location`, `ask_file`, `ask_voice` | `answer` (index 0), `timeout` (1) |
+| `ask_text`, `ask_contact`, `ask_location`, `ask_file`, `ask_voice`, `ask_date` | `answer` (index 0), `timeout` (1) |
 | `invoice_stars`, `invoice_card` | `next` (0, at once), `paid` (1), `timeout` (2) |
 | `channel_access` | `next` (0), `expiring` (1), `expired` (2), `failed` (3) |
 | `condition`, `check_subscription` | `yes` (0), `no` (1) |
-| `script` | `next` (0), `error` (1) |
+| `script`, `ai` | `next` (0), `error` (1) |
+| `album` | `next` (0), `no_images` (1) |
 | `web_app` | `next` (0, after sendData), `error` (1), `hooks` (series from 10: one entry per hook of the app, `null` for a hook without a branch) |
 | `switch` | `branches` (series from 0: case i → branch i, the fallback last) |
 | everything else | `next` (0) |
 
 A slot the type does not have is refused: *"message «Hi» has no error slot"*.
+
+A `message` or `reply_keyboard` with `buttons` waits for a tap: its `next` is accepted and never runs. What follows a tap goes under that button, as its `node`.
 
 ### Lines without a gap
 
@@ -129,11 +133,13 @@ Buttons in the text make the step wait for a tap, like a keyboard does: a `next`
 
 ### Cross-flow references
 
-Inside `content`: `target_flow` (navigation `start_flow`) and `notify_flow` (notify) name a flow of the **document** by `key`. An export may leave `target_flow_id` / `notify_flow_id` — a numeric id of a flow outside the export; valid only on the same bot. Writing back fewer flows than you exported? A key of a flow you left out (`"flow_8"`, `"faq"`) still names it: the writer looks it up among the bot's flows by the key the export gives it, and refuses a key no flow or several flows answer to. `audience_keys` on an announce names the document's `seed_audiences` by key and resolves into `audience_ids` (added to any ids already there).
+Inside `content`: `target_flow` (navigation `start_flow`) and `notify_flow` (notify) name a flow by `key` — a flow of the **document**, or one of the bot outside it: by its `flow_…` key from the flow list, or by the key its own export would give it (`"faq"` from the name, `"f_k3Jd8sQ2"` for a name that does not transliterate; the export warns about each). Writing back fewer flows than you exported works the same way: a key of a flow you left out still names it. The writer looks such a key up among the bot's flows and refuses one that no flow or several flows answer to.
+
+To change one flow, write a document with that flow alone, its `id` on it: the bot's other flows are not touched, and its jumps to them keep their keys. Leave `panels` out of such a document unless you mean to change them — an export of one flow carries every panel of the bot, and a written panel replaces the bot's. `audience_keys` on an announce names the document's `seed_audiences` by key and resolves into `audience_ids` (added to any ids already there).
 
 ### Placeholders
 
-`{{site_url}}` — this Lanka host; `{{bot.username}}`, `{{bot.public_key}}`; `{{owner_chat}}` — the owner's Telegram id (for `notify` → `target_chat_id`); `{{app_query}}` / `{{app_query_and}}` — `?scope=…` / `&scope=…` of the data space, empty in the main space; `{{flow.<key>}}` — the link key of a flow of this document, for deep links `t.me/{{bot.username}}?start={{flow.<key>}}-<data>`. Anything else must be listed in `params` and passed in the write body as `"params": {"name": "value"}`.
+`{{site_url}}` — this Lanka host; `{{bot.username}}`, `{{bot.public_key}}`; `{{owner_chat}}` — the owner's Telegram id (for `notify` → `target_chat_id`); `{{app_query}}` / `{{app_query_and}}` — `?scope=…` / `&scope=…` of the data space, empty in the main space; `{{flow.<key>}}` — the link key of a flow of this document, for deep links `t.me/{{bot.username}}?start={{flow.<key>}}-<data>`. Anything else must be listed in `params` and passed in the write body as `"params": {"name": "value"}`. Write placeholders instead of literal hosts and keys.
 
 Mini App url: `{{site_url}}/apps/<kind>/{{bot.public_key}}{{app_query}}`.
 

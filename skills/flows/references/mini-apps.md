@@ -10,7 +10,7 @@ A Mini App is a page Lanka hosts and a `web_app` button opens inside Telegram. *
 
 ## The bot's Mini Apps
 
-A Mini App works for a bot only when the bot has it in that data space. `GET /api/v1/bots/:bot_id/mini_apps` lists them: `[{id, scope, title, url, hooks, actions, notes}]` — `id` is the kind, `url` the one to put in a `web_app` node. A document gets the ones it needs by naming the kinds in `"mini_apps"` (format.md): writing it creates them in the write's data space, and keeps the ones the bot already has. A template or a panel the owner creates brings its own.
+A Mini App works for a bot only when the bot has it in that data space. `GET /api/v1/bots/:bot_id/mini_apps` (the `list_mini_apps` tool) lists them: `[{id, scope, title, url, hooks, actions, notes}]` — `id` is the kind, `url` the one to put in a `web_app` node. A document gets the ones it needs by naming the kinds in `"mini_apps"` (format.md): writing it creates them in the write's data space, and keeps the ones the bot already has. A template or a panel the owner creates brings its own.
 
 The look (button colour, corners) is the owner's, set in the panel next to the Mini App's preview. There is no API for it; do not try to style a Mini App from a flow.
 
