@@ -1,5 +1,5 @@
 {
-  "digest": "fd0539c84f18",
+  "digest": "abf640d3f72f",
   "format": "lanka-flows/v1",
   "placeholders": [
     "bot.username",
@@ -13,6 +13,7 @@
   "trigger_types": [
     "command",
     "text_match",
+    "fallback",
     "none"
   ],
   "node_types": {
@@ -21,14 +22,115 @@
         "next": 0
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "A message: a body, media, a keyboard",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          },
+          "format": {
+            "enum": [
+              "rich"
+            ],
+            "description": "a Telegram rich message: the body is blocks, not text"
+          },
+          "blocks": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "the rich body: Telegram InputRichBlock objects (guide: format § rich messages)"
+          },
+          "media_url": {
+            "type": "string",
+            "description": "a picture, video or file sent with the body: a public url or a token"
+          },
+          "protect_content": {
+            "type": "boolean",
+            "description": "Telegram forbids forwarding and saving it",
+            "default": false
+          },
+          "reactive": {
+            "type": "boolean",
+            "description": "the sent message, text and inline keyboard, is edited in place when a script changes a user.* or session.* variable it shows",
+            "default": false
+          }
+        },
+        "examples": [
+          {
+            "media_url": "https://example.com/menu.jpg"
+          }
+        ]
+      }
     },
     "reply_keyboard": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "A message with a reply keyboard: grey buttons under the input field",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          },
+          "format": {
+            "enum": [
+              "rich"
+            ],
+            "description": "a Telegram rich message: the body is blocks, not text"
+          },
+          "blocks": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "the rich body: Telegram InputRichBlock objects (guide: format § rich messages)"
+          },
+          "media_url": {
+            "type": "string",
+            "description": "a picture, video or file sent with the body: a public url or a token"
+          },
+          "protect_content": {
+            "type": "boolean",
+            "description": "Telegram forbids forwarding and saving it",
+            "default": false
+          },
+          "reactive": {
+            "type": "boolean",
+            "description": "the sent message, text and inline keyboard, is edited in place when a script changes a user.* or session.* variable it shows",
+            "default": false
+          },
+          "keyboard_persistent": {
+            "type": "boolean",
+            "description": "the keyboard stays after a tap",
+            "default": true
+          }
+        },
+        "examples": [
+          {
+            "keyboard_persistent": true
+          }
+        ]
+      }
     },
     "condition": {
       "slots": {
@@ -36,14 +138,116 @@
         "no": 1
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Yes or no on variables: one rule, or groups of rules",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "variable_name": {
+            "type": "string",
+            "description": "the variable compared: user.age, session.drink, platform.user_id"
+          },
+          "operator": {
+            "enum": [
+              "eq",
+              "neq",
+              "gt",
+              "lt",
+              "gte",
+              "lte",
+              "contains",
+              "is_set",
+              "is_null"
+            ],
+            "description": "how it is compared",
+            "default": "eq"
+          },
+          "compare_value": {
+            "type": "string",
+            "description": "what it is compared with, as written: a ###token### is not read"
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "variable_name": {
+                    "type": "string",
+                    "description": "the variable compared: user.age, session.drink, platform.user_id"
+                  },
+                  "operator": {
+                    "enum": [
+                      "eq",
+                      "neq",
+                      "gt",
+                      "lt",
+                      "gte",
+                      "lte",
+                      "contains",
+                      "is_set",
+                      "is_null"
+                    ],
+                    "description": "how it is compared",
+                    "default": "eq"
+                  },
+                  "compare_value": {
+                    "type": "string",
+                    "description": "what it is compared with, as written: a ###token### is not read"
+                  }
+                }
+              },
+              "description": "rules that must all hold"
+            },
+            "description": "groups of rules in place of the single rule: any group holding is a yes"
+          }
+        },
+        "examples": [
+          {
+            "variable_name": "user.age",
+            "operator": "gte",
+            "compare_value": "18"
+          }
+        ]
+      }
     },
     "url": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": true
+      "button_kind": true,
+      "content": {
+        "description": "A button that opens a link",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "the address: https://…, t.me/…, or a token"
+          },
+          "link_kind": {
+            "type": "string",
+            "description": "which kind of link the editor's picker built the url from; the url is what runs"
+          },
+          "link_target": {
+            "type": "string",
+            "description": "what the picker pointed at (a chat id, a bot id)"
+          }
+        },
+        "examples": [
+          {
+            "url": "https://lanka.bot"
+          }
+        ]
+      }
     },
     "script": {
       "slots": {
@@ -51,28 +255,163 @@
         "error": 1
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Runs a script over the variables (guide: steps § safe_expr)",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "script"
+        ],
+        "properties": {
+          "script": {
+            "type": "string",
+            "description": "the script, one statement a line"
+          }
+        },
+        "examples": [
+          {
+            "script": "user.greeted = true"
+          }
+        ]
+      }
     },
     "navigation": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Goes somewhere else: the start, another flow, back",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action"
+        ],
+        "properties": {
+          "action": {
+            "enum": [
+              "restart",
+              "start_flow",
+              "go_back",
+              "delete_message",
+              "delete_and_back"
+            ],
+            "description": "where to",
+            "default": "restart"
+          },
+          "message_mode": {
+            "enum": [
+              "resend",
+              "clear_history"
+            ],
+            "description": "what happens to the messages already in the chat"
+          },
+          "target_flow": {
+            "type": "string",
+            "description": "the flow start_flow opens, by its key in the document"
+          },
+          "target_flow_id": {
+            "type": "integer",
+            "description": "the flow start_flow opens, by the editor's row id — a document names every flow by key (target_flow)"
+          }
+        },
+        "examples": [
+          {
+            "action": "start_flow",
+            "target_flow": "menu"
+          }
+        ]
+      }
     },
     "delay": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Waits before the next step",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "delay_value",
+          "delay_unit"
+        ],
+        "properties": {
+          "delay_value": {
+            "type": "integer",
+            "description": "how long",
+            "minimum": 1,
+            "default": 5
+          },
+          "delay_unit": {
+            "enum": [
+              "seconds",
+              "minutes",
+              "hours"
+            ],
+            "description": "the unit of delay_value",
+            "default": "seconds"
+          }
+        },
+        "examples": [
+          {
+            "delay_value": 5,
+            "delay_unit": "seconds"
+          }
+        ]
+      }
     },
     "poll": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "A Telegram poll",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "question",
+          "options"
+        ],
+        "properties": {
+          "question": {
+            "type": "string",
+            "description": "the question"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "the answers",
+            "minItems": 2
+          },
+          "allows_multiple_answers": {
+            "type": "boolean",
+            "description": "more than one answer may be picked",
+            "default": false
+          },
+          "save_to": {
+            "type": "string",
+            "description": "the user.* variable that gets the answer"
+          }
+        },
+        "examples": [
+          {
+            "question": "Каву чи чай?",
+            "options": [
+              "Каву",
+              "Чай"
+            ],
+            "save_to": "drink"
+          }
+        ]
+      }
     },
     "web_app": {
       "slots": {
@@ -82,14 +421,73 @@
       "series": {
         "hooks": 10
       },
-      "button_kind": true
+      "button_kind": true,
+      "content": {
+        "description": "A button that opens a Mini App",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "the Mini App's address (list_mini_apps)"
+          },
+          "button_text": {
+            "type": "string",
+            "description": "the caption of the button that opens it",
+            "default": "Open"
+          },
+          "save_to": {
+            "type": "string",
+            "description": "the user.* variable that gets what the app sends back"
+          }
+        },
+        "examples": [
+          {
+            "url": "{{site_url}}/apps/shop"
+          }
+        ]
+      }
     },
     "list_buttons": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": true
+      "button_kind": true,
+      "content": {
+        "description": "A button for each item of a list of strings",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "options_var"
+        ],
+        "properties": {
+          "options_var": {
+            "type": "string",
+            "description": "the variable holding the list of strings: a path, not an expression; objects make no labels"
+          },
+          "buttons_per_row": {
+            "type": "integer",
+            "description": "buttons side by side",
+            "minimum": 1,
+            "maximum": 8,
+            "default": 1
+          },
+          "save_to": {
+            "type": "string",
+            "description": "the user.* variable that gets the label tapped, its position from 0 beside it as <name>_index"
+          }
+        },
+        "examples": [
+          {
+            "options_var": "doctor_names",
+            "save_to": "doctor_pick"
+          }
+        ]
+      }
     },
     "check_subscription": {
       "slots": {
@@ -97,77 +495,528 @@
         "no": 1
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Whether the person is in ONE channel or group right now (Telegram membership, not a paid access): yes / no",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "channel_chat_id"
+        ],
+        "properties": {
+          "channel_chat_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "the channel or group checked: a chat id (-1001234567890) or a public @username; the bot must be its administrator"
+          },
+          "save_to": {
+            "type": "string",
+            "description": "the user.* variable that gets true or false"
+          }
+        },
+        "examples": [
+          {
+            "channel_chat_id": "-1001234567890",
+            "save_to": "is_subscribed"
+          }
+        ]
+      }
     },
     "notify": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Sends a message to another chat: the owner, an operator, a group",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "target_chat_id"
+        ],
+        "properties": {
+          "target_chat_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "the one chat it goes to: a chat id, {{owner_chat}} for the owner, or a ###token### — a bare variable name is not read"
+          },
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          },
+          "media_url": {
+            "type": "string",
+            "description": "a picture, video or file sent with the body: a public url or a token"
+          },
+          "notify_flow": {
+            "type": "string",
+            "description": "the internal flow sent in place of the body, by its key in the document"
+          },
+          "notify_flow_id": {
+            "type": "integer",
+            "description": "the internal flow sent in place of the body, by the editor's row id — a document names every flow by key (notify_flow)"
+          },
+          "notify_detached_flow_id": {
+            "type": "integer",
+            "description": "a notification flow the editor keeps aside while the plain body is used"
+          },
+          "interrupt_level": {
+            "enum": [
+              "when_free",
+              "urgent"
+            ],
+            "description": "whether it waits until the person is out of a flow",
+            "default": "when_free"
+          }
+        },
+        "examples": [
+          {
+            "target_chat_id": "{{owner_chat}}"
+          }
+        ]
+      }
     },
     "share": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": true
+      "button_kind": true,
+      "content": {
+        "description": "A button that shares a link or the bot",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "mode": {
+            "enum": [
+              "link",
+              "inline"
+            ],
+            "description": "share a link, or the bot inline",
+            "default": "link"
+          },
+          "share_url": {
+            "type": "string",
+            "description": "the link shared"
+          },
+          "share_text": {
+            "type": "string",
+            "description": "the text shared with it"
+          },
+          "button_text": {
+            "type": "string",
+            "description": "the button's caption",
+            "default": "Share"
+          },
+          "link_kind": {
+            "type": "string",
+            "description": "which kind of link the editor's picker built the url from; the url is what runs"
+          },
+          "link_target": {
+            "type": "string",
+            "description": "what the picker pointed at (a chat id, a bot id)"
+          }
+        },
+        "examples": [
+          {
+            "mode": "link",
+            "share_url": "https://t.me/{{bot.username}}",
+            "share_text": "Тут смачна кава"
+          }
+        ]
+      }
     },
     "switch": {
       "slots": {},
       "series": {
         "branches": 0
       },
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Branches by a variable's value: case i takes branch i, anything else the last",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "variable_name"
+        ],
+        "properties": {
+          "variable_name": {
+            "type": "string",
+            "description": "the variable switched on"
+          },
+          "cases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "the values, one branch each"
+          }
+        },
+        "examples": [
+          {
+            "variable_name": "session.drink",
+            "cases": [
+              "Кава",
+              "Чай"
+            ]
+          }
+        ]
+      }
     },
     "remind": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "A message sent before or after a moment a variable holds",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "base"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          },
+          "base": {
+            "type": "string",
+            "description": "the variable holding the moment"
+          },
+          "offset_value": {
+            "type": "integer",
+            "description": "how far from it",
+            "minimum": 0,
+            "default": 1
+          },
+          "offset_unit": {
+            "enum": [
+              "seconds",
+              "minutes",
+              "hours",
+              "days"
+            ],
+            "description": "the unit of offset_value",
+            "default": "hours"
+          },
+          "offset_direction": {
+            "enum": [
+              "before",
+              "after"
+            ],
+            "description": "before or after the moment",
+            "default": "after"
+          },
+          "interrupt_level": {
+            "enum": [
+              "when_free",
+              "urgent"
+            ],
+            "description": "whether it waits until the person is out of a flow",
+            "default": "when_free"
+          }
+        },
+        "examples": [
+          {
+            "base": "user.visit_at",
+            "offset_value": 2,
+            "offset_unit": "hours",
+            "offset_direction": "before"
+          }
+        ]
+      }
     },
     "remove_keyboard": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Takes a reply keyboard away, with a message",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          }
+        },
+        "examples": [
+          {
+            "text": "Дякую!"
+          }
+        ]
+      }
     },
     "typing": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Shows «typing…» for a while",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "seconds"
+        ],
+        "properties": {
+          "seconds": {
+            "type": "integer",
+            "description": "how long",
+            "minimum": 1,
+            "default": 2
+          }
+        },
+        "examples": [
+          {
+            "seconds": 2
+          }
+        ]
+      }
     },
     "placeholder": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "A message the next step replaces",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          }
+        },
+        "examples": [
+          {
+            "text": "⏳ Хвилинку…"
+          }
+        ]
+      }
     },
     "visibility": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Shows the button above it only when the rule holds",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "variable_name": {
+            "type": "string",
+            "description": "the variable compared: user.age, session.drink, platform.user_id"
+          },
+          "operator": {
+            "enum": [
+              "eq",
+              "neq",
+              "gt",
+              "lt",
+              "gte",
+              "lte",
+              "contains",
+              "is_set",
+              "is_null"
+            ],
+            "description": "how it is compared",
+            "default": "eq"
+          },
+          "compare_value": {
+            "type": "string",
+            "description": "what it is compared with, as written: a ###token### is not read"
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "variable_name": {
+                    "type": "string",
+                    "description": "the variable compared: user.age, session.drink, platform.user_id"
+                  },
+                  "operator": {
+                    "enum": [
+                      "eq",
+                      "neq",
+                      "gt",
+                      "lt",
+                      "gte",
+                      "lte",
+                      "contains",
+                      "is_set",
+                      "is_null"
+                    ],
+                    "description": "how it is compared",
+                    "default": "eq"
+                  },
+                  "compare_value": {
+                    "type": "string",
+                    "description": "what it is compared with, as written: a ###token### is not read"
+                  }
+                }
+              },
+              "description": "rules that must all hold"
+            },
+            "description": "groups of rules in place of the single rule: any group holding is a yes"
+          }
+        },
+        "examples": [
+          {
+            "variable_name": "user.is_member",
+            "operator": "eq",
+            "compare_value": "true"
+          }
+        ]
+      }
     },
     "copy_text": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": true
+      "button_kind": true,
+      "content": {
+        "description": "A button that copies its text to the clipboard (256 characters at most)",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          }
+        },
+        "examples": [
+          {
+            "text": "PROMO2026"
+          }
+        ]
+      }
     },
     "announce": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Sends a message to many: an audience of visitors or the bot's channels",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "audience": {
+            "enum": [
+              "visitors",
+              "channels"
+            ],
+            "description": "visitors (audience_ids) or channels (target_chat_ids)",
+            "default": "visitors"
+          },
+          "audience_ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "the bot's audiences it goes to; empty for every visitor"
+          },
+          "audience_keys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "the document's seed_audiences it goes to, by key"
+          },
+          "target_chat_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "a chat id (-1001234567890) or a public @username"
+            },
+            "description": "the bot's channels and groups it goes to (list_channels)"
+          },
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          },
+          "media_url": {
+            "type": "string",
+            "description": "a picture, video or file sent with the body: a public url or a token"
+          },
+          "notify_flow": {
+            "type": "string",
+            "description": "the internal flow sent in place of the body, by its key in the document"
+          },
+          "notify_flow_id": {
+            "type": "integer",
+            "description": "the internal flow sent in place of the body, by the editor's row id — a document names every flow by key (notify_flow)"
+          },
+          "notify_detached_flow_id": {
+            "type": "integer",
+            "description": "a notification flow the editor keeps aside while the plain body is used"
+          },
+          "interrupt_level": {
+            "enum": [
+              "when_free",
+              "urgent"
+            ],
+            "description": "whether it waits until the person is out of a flow",
+            "default": "when_free"
+          }
+        },
+        "examples": [
+          {
+            "audience": "visitors",
+            "audience_keys": [
+              "news"
+            ]
+          }
+        ]
+      }
     },
     "album": {
       "slots": {
@@ -175,28 +1024,189 @@
         "no_images": 1
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Several photos in one message",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "the photos' addresses"
+          },
+          "images_var": {
+            "type": "string",
+            "description": "a variable holding the list of addresses, in place of images"
+          },
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          },
+          "protect_content": {
+            "type": "boolean",
+            "description": "Telegram forbids forwarding and saving it",
+            "default": false
+          }
+        },
+        "examples": [
+          {
+            "images": [
+              "https://example.com/1.jpg",
+              "https://example.com/2.jpg"
+            ]
+          }
+        ]
+      }
     },
     "voice": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "A voice message",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "media_url"
+        ],
+        "properties": {
+          "media_url": {
+            "type": "string",
+            "description": "the recording: a public url or a token"
+          },
+          "voice_duration": {
+            "type": "number",
+            "description": "its length in seconds, as the editor recorded it"
+          },
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          },
+          "protect_content": {
+            "type": "boolean",
+            "description": "Telegram forbids forwarding and saving it",
+            "default": false
+          }
+        },
+        "examples": [
+          {
+            "media_url": "https://example.com/hello.ogg"
+          }
+        ]
+      }
     },
     "temporary": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "A message that leaves the chat after a while",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "kind": {
+            "enum": [
+              "message",
+              "album",
+              "voice"
+            ],
+            "description": "what is sent",
+            "default": "message"
+          },
+          "delete_after_value": {
+            "type": "integer",
+            "description": "how long it stays",
+            "minimum": 1,
+            "default": 24
+          },
+          "delete_after_unit": {
+            "enum": [
+              "seconds",
+              "minutes",
+              "hours",
+              "days"
+            ],
+            "description": "the unit of delete_after_value",
+            "default": "hours"
+          },
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          },
+          "media_url": {
+            "type": "string",
+            "description": "a picture, video or file sent with the body: a public url or a token"
+          },
+          "protect_content": {
+            "type": "boolean",
+            "description": "Telegram forbids forwarding and saving it",
+            "default": false
+          }
+        },
+        "examples": [
+          {
+            "kind": "message",
+            "delete_after_value": 24,
+            "delete_after_unit": "hours"
+          }
+        ]
+      }
     },
     "location": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "A point on the map",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "point"
+        ],
+        "properties": {
+          "point": {
+            "type": "string",
+            "description": "latitude,longitude"
+          },
+          "title": {
+            "type": "string",
+            "description": "the place's name"
+          },
+          "address": {
+            "type": "string",
+            "description": "its address"
+          }
+        },
+        "examples": [
+          {
+            "point": "50.4501,30.5234",
+            "title": "Кав'ярня"
+          }
+        ]
+      }
     },
     "invoice_stars": {
       "slots": {
@@ -205,7 +1215,72 @@
         "timeout": 2
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "An invoice paid in Telegram Stars",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "amount"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          },
+          "media_url": {
+            "type": "string",
+            "description": "a picture, video or file sent with the body: a public url or a token"
+          },
+          "timeout_value": {
+            "type": "integer",
+            "description": "how long it waits; unset waits for good",
+            "minimum": 1
+          },
+          "timeout_unit": {
+            "enum": [
+              "seconds",
+              "minutes",
+              "hours",
+              "days"
+            ],
+            "description": "the unit of timeout_value"
+          },
+          "title": {
+            "type": "string",
+            "description": "the invoice's title"
+          },
+          "description": {
+            "type": "string",
+            "description": "the invoice's description"
+          },
+          "amount": {
+            "type": "string",
+            "description": "the price: a number, or a token"
+          },
+          "expire_on_timeout": {
+            "type": "boolean",
+            "description": "the invoice stops being payable when the timeout runs out",
+            "default": false
+          },
+          "save_to": {
+            "type": "string",
+            "description": "the user.* variable that gets the payment",
+            "default": "last_payment"
+          }
+        },
+        "examples": [
+          {
+            "title": "Доступ до клубу",
+            "amount": "100"
+          }
+        ]
+      }
     },
     "invoice_card": {
       "slots": {
@@ -214,7 +1289,203 @@
         "timeout": 2
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "An invoice paid by card through a payment provider",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "amount"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          },
+          "media_url": {
+            "type": "string",
+            "description": "a picture, video or file sent with the body: a public url or a token"
+          },
+          "timeout_value": {
+            "type": "integer",
+            "description": "how long it waits; unset waits for good",
+            "minimum": 1
+          },
+          "timeout_unit": {
+            "enum": [
+              "seconds",
+              "minutes",
+              "hours",
+              "days"
+            ],
+            "description": "the unit of timeout_value"
+          },
+          "title": {
+            "type": "string",
+            "description": "the invoice's title"
+          },
+          "description": {
+            "type": "string",
+            "description": "the invoice's description"
+          },
+          "amount": {
+            "type": "string",
+            "description": "the price: a number, or a token"
+          },
+          "expire_on_timeout": {
+            "type": "boolean",
+            "description": "the invoice stops being payable when the timeout runs out",
+            "default": false
+          },
+          "save_to": {
+            "type": "string",
+            "description": "the user.* variable that gets the payment",
+            "default": "last_payment"
+          },
+          "currency": {
+            "enum": [
+              "AED",
+              "AFN",
+              "ALL",
+              "AMD",
+              "ARS",
+              "AUD",
+              "AZN",
+              "BAM",
+              "BDT",
+              "BGN",
+              "BHD",
+              "BND",
+              "BOB",
+              "BRL",
+              "BYN",
+              "CAD",
+              "CHF",
+              "CLP",
+              "CNY",
+              "COP",
+              "CRC",
+              "CZK",
+              "DKK",
+              "DOP",
+              "DZD",
+              "EGP",
+              "ETB",
+              "EUR",
+              "GBP",
+              "GEL",
+              "GHS",
+              "GTQ",
+              "HKD",
+              "HNL",
+              "HRK",
+              "HUF",
+              "IDR",
+              "ILS",
+              "INR",
+              "IQD",
+              "IRR",
+              "ISK",
+              "JMD",
+              "JOD",
+              "JPY",
+              "KES",
+              "KGS",
+              "KRW",
+              "KZT",
+              "LBP",
+              "LKR",
+              "MAD",
+              "MDL",
+              "MMK",
+              "MNT",
+              "MOP",
+              "MUR",
+              "MVR",
+              "MXN",
+              "MYR",
+              "MZN",
+              "NGN",
+              "NIO",
+              "NOK",
+              "NPR",
+              "NZD",
+              "PAB",
+              "PEN",
+              "PHP",
+              "PKR",
+              "PLN",
+              "PYG",
+              "QAR",
+              "RON",
+              "RSD",
+              "RUB",
+              "SAR",
+              "SEK",
+              "SGD",
+              "SYP",
+              "THB",
+              "TJS",
+              "TRY",
+              "TTD",
+              "TWD",
+              "TZS",
+              "UAH",
+              "UGX",
+              "USD",
+              "UYU",
+              "UZS",
+              "VND",
+              "YER",
+              "ZAR"
+            ],
+            "description": "the currency",
+            "default": "UAH"
+          },
+          "provider_id": {
+            "type": "string",
+            "description": "the bot's payment provider; unset takes the first"
+          },
+          "need_email": {
+            "type": "boolean",
+            "description": "asks for an email",
+            "default": false
+          },
+          "need_phone": {
+            "type": "boolean",
+            "description": "asks for a phone",
+            "default": false
+          },
+          "tips": {
+            "type": "boolean",
+            "description": "offers a tip",
+            "default": false
+          },
+          "tip_max": {
+            "type": "string",
+            "description": "the largest tip"
+          },
+          "tip_suggested": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "suggested tips; an empty one is skipped"
+          }
+        },
+        "examples": [
+          {
+            "title": "Доступ до клубу",
+            "amount": "300",
+            "currency": "UAH"
+          }
+        ]
+      }
     },
     "channel_access": {
       "slots": {
@@ -224,21 +1495,244 @@
         "failed": 3
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Gives a paid or free access to closed channels for a term: a join link, the term's end, warnings (ChannelAccess)",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "channel_chat_ids"
+        ],
+        "properties": {
+          "channel_chat_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "a chat id (-1001234567890) or a public @username"
+            },
+            "description": "the bot's channels and groups (list_channels), at least one"
+          },
+          "term_value": {
+            "type": "integer",
+            "description": "how long the access lasts",
+            "minimum": 0,
+            "default": 30
+          },
+          "term_unit": {
+            "enum": [
+              "seconds",
+              "minutes",
+              "hours",
+              "days"
+            ],
+            "description": "the unit of term_value",
+            "default": "days"
+          },
+          "forever": {
+            "type": "boolean",
+            "description": "no end",
+            "default": false
+          },
+          "warn_value": {
+            "type": "integer",
+            "description": "how long before the end the person is warned (the expiring slot)",
+            "minimum": 0,
+            "default": 3
+          },
+          "warn_unit": {
+            "enum": [
+              "seconds",
+              "minutes",
+              "hours",
+              "days"
+            ],
+            "description": "the unit of warn_value",
+            "default": "days"
+          },
+          "add_to_rest": {
+            "type": "boolean",
+            "description": "a renewal adds to the time left instead of starting over",
+            "default": false
+          },
+          "save_to": {
+            "type": "string",
+            "description": "the user.* variable that gets the join links and the term's end",
+            "default": "access"
+          }
+        },
+        "examples": [
+          {
+            "channel_chat_ids": [
+              "-1001234567890"
+            ],
+            "term_value": 30,
+            "term_unit": "days",
+            "save_to": "access"
+          }
+        ]
+      }
     },
     "channel_revoke": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Removes the person from closed channels and ends their access",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "channel_chat_ids"
+        ],
+        "properties": {
+          "channel_chat_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "a chat id (-1001234567890) or a public @username"
+            },
+            "description": "the bot's channels and groups (list_channels), at least one"
+          }
+        },
+        "examples": [
+          {
+            "channel_chat_ids": [
+              "-1001234567890"
+            ]
+          }
+        ]
+      }
     },
     "copy_message": {
       "slots": {
         "next": 0
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Copies the person's last message to an audience or to chats",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "audience": {
+            "enum": [
+              "visitors",
+              "chats"
+            ],
+            "description": "visitors (audience_ids) or chats (target_chat_ids)",
+            "default": "visitors"
+          },
+          "audience_ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "the bot's audiences it goes to; empty for every visitor"
+          },
+          "audience_keys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "the document's seed_audiences it goes to, by key"
+          },
+          "target_chat_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "a chat id (-1001234567890) or a public @username"
+            },
+            "description": "the bot's channels and groups it goes to (list_channels)"
+          }
+        },
+        "examples": [
+          {
+            "audience": "chats",
+            "target_chat_ids": [
+              "-1001234567890"
+            ]
+          }
+        ]
+      }
+    },
+    "ai": {
+      "slots": {
+        "next": 0,
+        "error": 1
+      },
+      "series": {},
+      "button_kind": false,
+      "content": {
+        "description": "Asks a model with the owner's API key (a bot secret named after the provider) and saves the answer",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "prompt",
+          "save_to"
+        ],
+        "properties": {
+          "provider": {
+            "enum": [
+              "anthropic",
+              "openai",
+              "google"
+            ],
+            "description": "whose model",
+            "default": "anthropic"
+          },
+          "model": {
+            "type": "string",
+            "description": "the model id; unset is the provider's default"
+          },
+          "prompt": {
+            "type": "string",
+            "description": "what the model is asked; tokens allowed"
+          },
+          "system": {
+            "type": "string",
+            "description": "how the model should answer: a role, a tone, rules; tokens allowed"
+          },
+          "format": {
+            "enum": [
+              "text",
+              "json"
+            ],
+            "description": "text, or JSON parsed into an object",
+            "default": "text"
+          },
+          "history": {
+            "type": "integer",
+            "description": "how many of the person's last messages with the bot, both sides, go before the prompt; unset sends none",
+            "minimum": 0,
+            "maximum": 50
+          },
+          "history_hours": {
+            "type": "integer",
+            "description": "only messages from this many last hours; unset takes any age",
+            "minimum": 1
+          },
+          "text": {
+            "type": "string",
+            "description": "sent while the model thinks; the bot's next message takes its place; unset sends none"
+          },
+          "save_to": {
+            "type": "string",
+            "description": "the user.* variable that gets the answer"
+          }
+        },
+        "examples": [
+          {
+            "provider": "anthropic",
+            "prompt": "Одним реченням: що шукає людина, яка написала «###session.question###»?",
+            "save_to": "intent"
+          }
+        ]
+      }
     },
     "ask_text": {
       "slots": {
@@ -246,7 +1740,69 @@
         "timeout": 1
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Asks for a text and waits. Stores the text; with accept any, a message that is no text as {kind, file_id, …, caption}",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "variable_name"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          },
+          "media_url": {
+            "type": "string",
+            "description": "a picture, video or file sent with the body: a public url or a token"
+          },
+          "reactive": {
+            "type": "boolean",
+            "description": "the sent message, text and inline keyboard, is edited in place when a script changes a user.* or session.* variable it shows",
+            "default": false
+          },
+          "timeout_value": {
+            "type": "integer",
+            "description": "how long it waits; unset waits for good",
+            "minimum": 1
+          },
+          "timeout_unit": {
+            "enum": [
+              "seconds",
+              "minutes",
+              "hours"
+            ],
+            "description": "the unit of timeout_value"
+          },
+          "variable_name": {
+            "type": "string",
+            "description": "the user.* variable the answer goes to",
+            "default": "user_input"
+          },
+          "input_placeholder": {
+            "type": "string",
+            "description": "the hint in the person's input field"
+          },
+          "accept": {
+            "enum": [
+              "text",
+              "any"
+            ],
+            "description": "what counts as an answer",
+            "default": "text"
+          }
+        },
+        "examples": [
+          {
+            "variable_name": "name"
+          }
+        ]
+      }
     },
     "ask_contact": {
       "slots": {
@@ -254,7 +1810,65 @@
         "timeout": 1
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Asks for the phone number through a button. Stores an object, not a string: {phone_number, first_name, last_name, user_id, shared: true}, or {phone_number, digits, shared: false} for a number typed instead",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "variable_name"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          },
+          "media_url": {
+            "type": "string",
+            "description": "a picture, video or file sent with the body: a public url or a token"
+          },
+          "reactive": {
+            "type": "boolean",
+            "description": "the sent message, text and inline keyboard, is edited in place when a script changes a user.* or session.* variable it shows",
+            "default": false
+          },
+          "timeout_value": {
+            "type": "integer",
+            "description": "how long it waits; unset waits for good",
+            "minimum": 1
+          },
+          "timeout_unit": {
+            "enum": [
+              "seconds",
+              "minutes",
+              "hours"
+            ],
+            "description": "the unit of timeout_value"
+          },
+          "variable_name": {
+            "type": "string",
+            "description": "the user.* variable the answer goes to",
+            "default": "user_input"
+          },
+          "input_placeholder": {
+            "type": "string",
+            "description": "the hint in the person's input field"
+          },
+          "button_text": {
+            "type": "string",
+            "description": "the caption of the button that shares the contact"
+          }
+        },
+        "examples": [
+          {
+            "variable_name": "phone"
+          }
+        ]
+      }
     },
     "ask_location": {
       "slots": {
@@ -262,7 +1876,65 @@
         "timeout": 1
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Asks for a location through a button. Stores {latitude, longitude}, or {address} for a text typed instead",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "variable_name"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          },
+          "media_url": {
+            "type": "string",
+            "description": "a picture, video or file sent with the body: a public url or a token"
+          },
+          "reactive": {
+            "type": "boolean",
+            "description": "the sent message, text and inline keyboard, is edited in place when a script changes a user.* or session.* variable it shows",
+            "default": false
+          },
+          "timeout_value": {
+            "type": "integer",
+            "description": "how long it waits; unset waits for good",
+            "minimum": 1
+          },
+          "timeout_unit": {
+            "enum": [
+              "seconds",
+              "minutes",
+              "hours"
+            ],
+            "description": "the unit of timeout_value"
+          },
+          "variable_name": {
+            "type": "string",
+            "description": "the user.* variable the answer goes to",
+            "default": "user_input"
+          },
+          "input_placeholder": {
+            "type": "string",
+            "description": "the hint in the person's input field"
+          },
+          "button_text": {
+            "type": "string",
+            "description": "the caption of the button that shares the location"
+          }
+        },
+        "examples": [
+          {
+            "variable_name": "location"
+          }
+        ]
+      }
     },
     "ask_file": {
       "slots": {
@@ -270,7 +1942,71 @@
         "timeout": 1
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Asks for a file or a photo. Stores {kind: photo, file_id, file_unique_id} or {kind: document, file_id, file_name, mime_type}, with the caption when there is one",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "variable_name"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          },
+          "media_url": {
+            "type": "string",
+            "description": "a picture, video or file sent with the body: a public url or a token"
+          },
+          "reactive": {
+            "type": "boolean",
+            "description": "the sent message, text and inline keyboard, is edited in place when a script changes a user.* or session.* variable it shows",
+            "default": false
+          },
+          "timeout_value": {
+            "type": "integer",
+            "description": "how long it waits; unset waits for good",
+            "minimum": 1
+          },
+          "timeout_unit": {
+            "enum": [
+              "seconds",
+              "minutes",
+              "hours"
+            ],
+            "description": "the unit of timeout_value"
+          },
+          "variable_name": {
+            "type": "string",
+            "description": "the user.* variable the answer goes to",
+            "default": "user_input"
+          },
+          "input_placeholder": {
+            "type": "string",
+            "description": "the hint in the person's input field"
+          },
+          "accept": {
+            "enum": [
+              "any",
+              "photo",
+              "document"
+            ],
+            "description": "what counts as an answer",
+            "default": "any"
+          }
+        },
+        "examples": [
+          {
+            "variable_name": "photo",
+            "accept": "photo"
+          }
+        ]
+      }
     },
     "ask_voice": {
       "slots": {
@@ -278,7 +2014,61 @@
         "timeout": 1
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Asks for a voice message. Stores {kind: voice | audio, file_id, duration, mime_type}",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "variable_name"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          },
+          "media_url": {
+            "type": "string",
+            "description": "a picture, video or file sent with the body: a public url or a token"
+          },
+          "reactive": {
+            "type": "boolean",
+            "description": "the sent message, text and inline keyboard, is edited in place when a script changes a user.* or session.* variable it shows",
+            "default": false
+          },
+          "timeout_value": {
+            "type": "integer",
+            "description": "how long it waits; unset waits for good",
+            "minimum": 1
+          },
+          "timeout_unit": {
+            "enum": [
+              "seconds",
+              "minutes",
+              "hours"
+            ],
+            "description": "the unit of timeout_value"
+          },
+          "variable_name": {
+            "type": "string",
+            "description": "the user.* variable the answer goes to",
+            "default": "user_input"
+          },
+          "input_placeholder": {
+            "type": "string",
+            "description": "the hint in the person's input field"
+          }
+        },
+        "examples": [
+          {
+            "variable_name": "voice"
+          }
+        ]
+      }
     },
     "ask_date": {
       "slots": {
@@ -286,10 +2076,136 @@
         "timeout": 1
       },
       "series": {},
-      "button_kind": false
+      "button_kind": false,
+      "content": {
+        "description": "Asks for a date on a calendar. Stores it as \"2026-10-16\"",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "variable_name"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "the body as plain text, tokens as ###user.name###; a document usually carries the body as the node's paragraphs instead"
+          },
+          "html": {
+            "type": "string",
+            "description": "the body as Telegram HTML, where it is more than plain paragraphs"
+          },
+          "media_url": {
+            "type": "string",
+            "description": "a picture, video or file sent with the body: a public url or a token"
+          },
+          "reactive": {
+            "type": "boolean",
+            "description": "the sent message, text and inline keyboard, is edited in place when a script changes a user.* or session.* variable it shows",
+            "default": false
+          },
+          "timeout_value": {
+            "type": "integer",
+            "description": "how long it waits; unset waits for good",
+            "minimum": 1
+          },
+          "timeout_unit": {
+            "enum": [
+              "seconds",
+              "minutes",
+              "hours"
+            ],
+            "description": "the unit of timeout_value"
+          },
+          "variable_name": {
+            "type": "string",
+            "description": "the user.* variable the answer goes to",
+            "default": "user_input"
+          },
+          "input_placeholder": {
+            "type": "string",
+            "description": "the hint in the person's input field"
+          },
+          "view": {
+            "enum": [
+              "month",
+              "week",
+              "two_weeks"
+            ],
+            "description": "how much a page shows",
+            "default": "month"
+          },
+          "weekdays": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 7
+            },
+            "description": "the days of the week offered, ISO (1 Monday … 7 Sunday)",
+            "default": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ]
+          },
+          "min_date": {
+            "type": "string",
+            "description": "the first date offered",
+            "format": "date"
+          },
+          "max_date": {
+            "type": "string",
+            "description": "the last date offered",
+            "format": "date"
+          },
+          "dates": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "a date, YYYY-MM-DD",
+              "format": "date"
+            },
+            "description": "only these dates"
+          },
+          "min_date_var": {
+            "type": "string",
+            "description": "a variable holding the first date"
+          },
+          "max_date_var": {
+            "type": "string",
+            "description": "a variable holding the last date"
+          },
+          "dates_var": {
+            "type": "string",
+            "description": "a variable holding the list of dates offered"
+          }
+        },
+        "examples": [
+          {
+            "variable_name": "visit_date",
+            "view": "two_weeks",
+            "weekdays": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ]
+          }
+        ]
+      }
     }
   },
   "enums": {
+    "message.format": [
+      "rich"
+    ],
+    "reply_keyboard.format": [
+      "rich"
+    ],
     "condition.operator": [
       "eq",
       "neq",
@@ -308,23 +2224,22 @@
       "delete_message",
       "delete_and_back"
     ],
-    "ask_file.accept": [
-      "any",
-      "photo",
-      "document"
-    ],
-    "ask_text.accept": [
-      "text",
-      "any"
-    ],
-    "copy_message.audience": [
-      "visitors",
-      "chats"
+    "navigation.message_mode": [
+      "resend",
+      "clear_history"
     ],
     "delay.delay_unit": [
       "seconds",
       "minutes",
       "hours"
+    ],
+    "notify.interrupt_level": [
+      "when_free",
+      "urgent"
+    ],
+    "share.mode": [
+      "link",
+      "inline"
     ],
     "remind.offset_unit": [
       "seconds",
@@ -332,10 +2247,55 @@
       "hours",
       "days"
     ],
+    "remind.offset_direction": [
+      "before",
+      "after"
+    ],
+    "remind.interrupt_level": [
+      "when_free",
+      "urgent"
+    ],
+    "visibility.operator": [
+      "eq",
+      "neq",
+      "gt",
+      "lt",
+      "gte",
+      "lte",
+      "contains",
+      "is_set",
+      "is_null"
+    ],
+    "announce.audience": [
+      "visitors",
+      "channels"
+    ],
+    "announce.interrupt_level": [
+      "when_free",
+      "urgent"
+    ],
     "temporary.kind": [
       "message",
       "album",
       "voice"
+    ],
+    "temporary.delete_after_unit": [
+      "seconds",
+      "minutes",
+      "hours",
+      "days"
+    ],
+    "invoice_stars.timeout_unit": [
+      "seconds",
+      "minutes",
+      "hours",
+      "days"
+    ],
+    "invoice_card.timeout_unit": [
+      "seconds",
+      "minutes",
+      "hours",
+      "days"
     ],
     "invoice_card.currency": [
       "AED",
@@ -433,24 +2393,6 @@
       "YER",
       "ZAR"
     ],
-    "temporary.delete_after_unit": [
-      "seconds",
-      "minutes",
-      "hours",
-      "days"
-    ],
-    "invoice_stars.timeout_unit": [
-      "seconds",
-      "minutes",
-      "hours",
-      "days"
-    ],
-    "invoice_card.timeout_unit": [
-      "seconds",
-      "minutes",
-      "hours",
-      "days"
-    ],
     "channel_access.term_unit": [
       "seconds",
       "minutes",
@@ -463,30 +2405,27 @@
       "hours",
       "days"
     ],
-    "remind.offset_direction": [
-      "before",
-      "after"
+    "copy_message.audience": [
+      "visitors",
+      "chats"
     ],
-    "notify.interrupt_level": [
-      "when_free",
-      "urgent"
+    "ai.provider": [
+      "anthropic",
+      "openai",
+      "google"
     ],
-    "announce.interrupt_level": [
-      "when_free",
-      "urgent"
-    ],
-    "share.mode": [
-      "link",
-      "inline"
-    ],
-    "navigation.message_mode": [
-      "resend",
-      "clear_history"
+    "ai.format": [
+      "text",
+      "json"
     ],
     "ask_text.timeout_unit": [
       "seconds",
       "minutes",
       "hours"
+    ],
+    "ask_text.accept": [
+      "text",
+      "any"
     ],
     "ask_contact.timeout_unit": [
       "seconds",
@@ -503,6 +2442,11 @@
       "minutes",
       "hours"
     ],
+    "ask_file.accept": [
+      "any",
+      "photo",
+      "document"
+    ],
     "ask_voice.timeout_unit": [
       "seconds",
       "minutes",
@@ -512,6 +2456,11 @@
       "seconds",
       "minutes",
       "hours"
+    ],
+    "ask_date.view": [
+      "month",
+      "week",
+      "two_weeks"
     ]
   },
   "safe_expr": {
@@ -794,8 +2743,8 @@
       },
       {
         "name": "update_where",
-        "sig": "update_where(list, expr, key, value)",
-        "minArgs": 4,
+        "sig": "update_where(list, expr, {key: value, …})",
+        "minArgs": 3,
         "maxArgs": 4
       }
     ],

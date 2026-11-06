@@ -1,24 +1,30 @@
 # Node types
 
-36 types. A dialog runs in the visitor's private chat with the bot: what they write in a group the bot is in drives no flow. A node is `{type, name, paragraphs?, content?, buttons?, <slots>}` (format.md). `paragraphs` is the message body; `content` holds the keys below; tokens `###user.x###` render inside body, button labels, `media_url`, `notify.target_chat_id`. The machine-readable list of types, slots, operators and units is `generated.json` — trust it over this page if they differ.
+A dialog runs in the visitor's private chat with the bot: what they write in a group the bot is in drives no flow. A node is `{type, name, paragraphs?, content?, buttons?, <slots>}` (format.md). `paragraphs` is the message body; `content` holds the keys below; tokens `###user.x###` render inside body, button labels, `media_url`, `notify.target_chat_id`. The machine-readable list of types, slots, operators and units is `generated.json` (`guide` topic `steps`) — trust it over this page if they differ.
 
 ## Steps that show something
 
 | type | content | behaviour |
 |---|---|---|
-| `message` | `media_url` (a photo, video or audio url — the kind is read from the extension; tokens ok; a single token naming an `ask_file` answer, `###user.tests###`, sends that file on — this holds for every step with `media_url`), `reactive` (bool) | Sends the body (as the file's caption when `media_url`; a body over 1024 characters goes as its own message after the bare file, buttons on the text). A body over 4096 characters — counted after tokens render — goes as several messages, cut between paragraphs where it can, buttons on the last. With buttons it waits for a tap; without, continues to `next`. |
+| `message` | `media_url` (a photo, video or audio url — the kind is read from the extension; tokens ok; a single token naming an `ask_file` answer, `###user.tests###`, sends that file on — this holds for every step with `media_url`), `reactive` (bool) | Sends the body (as the file's caption when `media_url`; a body over 1024 characters goes as its own message after the bare file, buttons on the text). A body over 4096 characters — counted after tokens render — goes as several messages, cut between paragraphs where it can, buttons on the last. With any button it waits for a tap — a link button, one a `visibility` hides and one inside a rich text count too — and a `next` beside buttons never runs: what follows goes under a button. Without buttons it continues to `next`. |
 | `reply_keyboard` | as `message` + `keyboard_persistent` (default `true` → `is_persistent`) | Same, with a [ReplyKeyboardMarkup](https://core.telegram.org/bots/api#replykeyboardmarkup) instead of an inline one — so no `url`/`share` buttons, and a `web_app` button can send data back ([KeyboardButton](https://core.telegram.org/bots/api#keyboardbutton)). |
 | `ask_text` | `variable_name` (default `"user_input"`), `accept` ∈ `text` (default) `any`, `input_placeholder` (tokens ok, ≤64 chars), `timeout_value`, `timeout_unit` ∈ `seconds` `minutes` `hours`, `media_url`, `reactive` | Sends the question, halts until the visitor types an answer; the text lands in `user.<variable_name>`. With `accept: any` a message without text answers too — a photo, video, voice, file, sticker, poll, contact, location — stored as `{kind, file_id…, caption?}`; `copy_message` after it sends that message on as it is. An answer of the wrong kind gets a «waiting for …» reply and the step keeps waiting. `input_placeholder` is the grey hint in the input field, sent on a [ForceReply](https://core.telegram.org/bots/api#forcereply) (the answer arrives as a reply to the question). Slots `answer` (0) and `timeout` (1) — the timer arms only when a `timeout` child exists. The same slots and timeout keys hold for every `ask_*` step. |
-| `ask_contact` | as `ask_text` + `button_text` | Shows a one-time [request button](https://core.telegram.org/bots/api#keyboardbutton) that shares the account's number → `{phone_number, first_name, last_name, user_id, shared: true}`. A typed number of 9+ digits is taken too → `{phone_number, digits, shared: false}`. `input_placeholder` rides on the button's keyboard. |
+| `ask_contact` | as `ask_text` + `button_text` | Shows a one-time [request button](https://core.telegram.org/bots/api#keyboardbutton) that shares the account's number → an object, not a string: `{phone_number, first_name, last_name, user_id, shared: true}`. A typed number of 9+ digits is taken too → `{phone_number, digits, shared: false}`. The number itself is `user.<variable_name>.phone_number`. `input_placeholder` rides on the button's keyboard. |
 | `ask_location` | as `ask_contact` | Request button for a location → `{latitude, longitude}`; a typed address instead → `{address}`. |
-| `ask_file` | as `ask_text` + `accept` ∈ `any` (default) `photo` `document` | Waits for a file of that kind: a photo → `{file_id, file_unique_id, kind: "photo"}`, a document → `{file_id, file_name, mime_type, kind: "document"}`. |
-| `ask_voice` | as `ask_text` | Waits for a voice message, or an audio file sent instead → `{file_id, duration, file_name, mime_type}`. |
-| `ask_date` | as `ask_text` (no `accept`, no `input_placeholder`) + `view` ∈ `month` (default) `two_weeks` `week`, `min_date` `max_date` (`"2026-10-16"`, each optional), `dates` (only these days), `weekdays` (ISO 1–7; empty — every day; ignored once `dates` are listed); `min_date_var` `max_date_var` `dates_var` read the same from a variable in the conversation | Sends a calendar (the body as its question) and halts until a day is picked or typed (`16.10.2026`, `16.10`, `2026-10-16`); the arrows turn the page in place. Stores `"2026-10-16"` in `user.<variable_name>`. A `dates_var` holding an empty list offers nothing — fill it from a script with the free days. Today is in the bot's time zone. |
+| `ask_file` | as `ask_text` + `accept` ∈ `any` (default) `photo` `document` | Waits for a file of that kind: a photo → `{file_id, file_unique_id, kind: "photo"}`, a document → `{file_id, file_name, mime_type, kind: "document"}`; the caption, when there is one, as `caption`. |
+| `ask_voice` | as `ask_text` | Waits for a voice message → `{file_id, duration, mime_type, kind: "voice"}`, or an audio file sent instead → `{file_id, duration, file_name, mime_type, kind: "audio"}`. |
+| `ask_date` | as `ask_text` (no `accept`, no `input_placeholder`) + `view` ∈ `month` (default) `two_weeks` `week`, `min_date` `max_date` (`"2026-10-16"`, each optional), `dates` (only these days), `weekdays` (ISO 1–7; empty — every day; ignored once `dates` are listed); `min_date_var` `max_date_var` `dates_var` read the same from a variable in the conversation | Sends a calendar (the body as its question) and halts until a day is picked or typed (`16.10.2026`, `16.10`, `2026-10-16`); the arrows turn the page in place. Stores `"2026-10-16"` in `user.<variable_name>`. A `dates_var` holding an empty list offers nothing — fill it from a script with the free days. Today is in the bot's time zone, the same day as `platform.today`. |
 | `poll` | `question`, `options` (strings), `save_to`, `allows_multiple_answers` | A [poll](https://core.telegram.org/bots/api#sendpoll), always public — Telegram reports answers only for those; halts until answered. Stores the chosen label (or labels) in `user.<save_to>`. |
 | `placeholder` | body only (default «⏳ Хвилинку…») | Sends a message the **next** send edits in place — put it before a slow `script`. |
 | `remove_keyboard` | body (may be empty) | Removes a reply keyboard; with text the message stays, without it is deleted right after. |
 | `typing` | `seconds` (1–5) | Shows «typing…» then continues. |
 | `delay` | `delay_value`, `delay_unit` ∈ `seconds` `minutes` `hours` | Pauses the visitor, resumes on `next`. |
+
+### Messages that update in place — `reactive`
+
+`reactive: true` on a step that sends a body: when a script later changes a `user.*` or `session.*` variable the sent message shows, Lanka edits that message in place. The text and the inline keyboard are both rebuilt — button labels, `visibility` and a `list_buttons` list included, so a list alone is enough to keep a message live. A reply keyboard keeps its buttons until the step is sent again.
+
+Only a script's write does it (a `script` step, a Mini App action). A change of `app.*` does not, and neither does a value a step stores by itself: an `ask_*` answer, a `list_buttons` pick, a payment.
 
 ## Steps that decide
 
@@ -27,14 +33,15 @@
 | `condition` | `groups` — or, for one rule, `variable_name`, `operator`, `compare_value` inline | Slots `yes` (0) / `no` (1). Rules and operators below. |
 | `switch` | `variable_name`, `cases` (strings) | Case *i* → `branches[i]`; no match → `branches[cases.length]` (the fallback, last). String equality. Never renumber existing branches. |
 | `check_subscription` | `channel_chat_id`, `save_to` | `yes` (0) when the visitor is a member of the channel ([getChatMember](https://core.telegram.org/bots/api#getchatmember)), `no` (1) otherwise or when the check itself fails (the owner gets a report). The bot must be an admin of the channel. |
-| `visibility` | as `condition` | **First node under a button**: the button shows only while the condition holds. The button's real target — a step or a button kind — is its `next`. No `variable_name` = always visible. |
+| `visibility` | as `condition` | **First node under a button**: the button shows only while the condition holds. The button's real target — a step or a button kind — is its `next`. No `variable_name` = always visible. Checked when the message is sent, at every `reactive` rebuild and again on the tap. Works on the keyboards of `message` and `reply_keyboard`, a whole `list_buttons` list included. A button inside a rich text is always drawn and only its tap is checked; a channel post drops a conditional button. |
 
 ### Rules and operators (`condition`, `visibility`)
 
 A rule is `{variable_name, operator, compare_value}`. `groups` is a list of groups, each a list of rules: the condition holds when **any** group has **every** one of its rules hold — `[[a, b], [c]]` reads "(a and b) or c". One rule may still be written inline instead of `groups`. A rule without `variable_name` is ignored; no rule at all — a condition compares the empty value, a visibility always shows.
 
-
 `eq` `neq` — string equality (`1` equals `"1"`); `gt` `lt` `gte` `lte` — numeric; `contains` — substring / list member / object key; `is_set` — present (note: `false`, `""`, `[]` are **not** set); `is_null` — unset. `is_set`/`is_null` ignore `compare_value`.
+
+`compare_value` is compared as it is written: a `{{placeholder}}` is filled on write, a `###token###` is not read. To compare two variables, compute the answer in a script (`same = user.a == user.b`) and test that.
 
 `variable_name` here (and in `switch`, `remind`, `list_buttons.options_var`) may be `user.x`, `session.x`, `app.x`, `platform.x`, `initiator.x`, or a bare name, which reads session → user → platform. Nested paths and list indexes work: `user.cart.0.name`.
 
@@ -42,9 +49,10 @@ A rule is `{variable_name, operator, compare_value}`. `groups` is a list of grou
 
 | type | content | behaviour |
 |---|---|---|
-| `script` | `script` (safe-expr, see safe-expr.md) | Runs the script. Slots `next` (0) and `error` (1) — `error` fires only on a script failure (syntax, type, limit), **not** on a failed `fetch`: branch on `temp.r.status` yourself. Without an `error` child a failure shows «⚠️ Щось пішло не так…» and stops. |
+| `script` | `script` (safe-expr, see safe-expr.md) | Runs the script. Slots `next` (0) and `error` (1) — `error` fires only on a script failure (syntax, type, limit), **not** on a failed `fetch`: branch on `temp.r.status` yourself. Without an `error` child a failure shows «⚠️ Щось пішло не так…» and stops (§ When a step fails). |
+| `ai` | `prompt` (what the model is asked; tokens ok), `system` (a role, a tone, rules; tokens ok), `provider` ∈ `anthropic` (default) `openai` `google`, `model` (unset — the provider's default), `history` (how many of the person's last messages with the bot, both sides, go before the prompt; 0–50), `history_hours` (only messages this fresh), `format` ∈ `text` (default) `json`, `save_to`, `text` (sent while the model thinks; the bot's next message takes its place) | Asks a model with the owner's API key — a bot secret named after the provider — in the background, and stores the answer in `user.<save_to>`: plain text, Telegram HTML when the name ends in `_html`, an object with `format: json`. Slots `next` (0) and `error` (1) — no prompt, no key, a JSON answer that does not parse. |
 | `navigation` | `action` ∈ `restart` `start_flow` `go_back` `delete_message` `delete_and_back`, `target_flow` (key; `start_flow`), `message_mode` ∈ `resend` `clear_history` | Terminal: moves the visitor. `clear_history` sweeps the sent messages first. |
-| `notify` | `target_chat_id` (tokens ok — `{{owner_chat}}` for the owner), `media_url` (a photo, tokens ok), `interrupt_level` ∈ `when_free` (default) `urgent`, `notify_flow` (key of an `internal` flow) | Either sends the body to another chat rendered with the **visitor's** variables, or starts the internal notification flow there — it begins with the firing conversation's session variables as its own — where `###initiator.name###`, `###initiator.username###`, `###initiator.user_id###` and `###initiator.<any user var>###` are the visitor who fired it. `when_free` waits while the recipient is mid-conversation. Never breaks the visitor's flow. Continues to `next`. |
+| `notify` | `target_chat_id` (one chat, a string: a chat id `"123456789"`, `{{owner_chat}}` for the owner, or a token — `###user.manager_chat###`; a bare variable name is not read), `media_url` (a photo, tokens ok), `interrupt_level` ∈ `when_free` (default) `urgent`, `notify_flow` (key of an `internal` flow) | Either sends the body to another chat rendered with the **visitor's** variables, or starts the internal notification flow there — it begins with the firing conversation's session variables as its own — where `###initiator.name###`, `###initiator.username###`, `###initiator.user_id###` and `###initiator.<any user var>###` are the visitor who fired it; `target_chat_id: "###initiator.user_id###"` inside that flow answers them back. `when_free` waits while the recipient is mid-conversation. Never breaks the visitor's flow: a target that renders empty, or a chat Telegram refuses, sends nothing and the flow goes on. Continues to `next`. |
 | `announce` | `audience` ∈ `visitors` (default) `channels`; for visitors `audience_ids` (ids of the bot's audiences; empty — every visitor), `audience_keys` (keys of the document's `seed_audiences`, resolved to ids), `media_url` (a photo, tokens ok), `interrupt_level` ∈ `when_free` (default) `urgent`, `notify_flow` (key of an `internal` flow); for channels `target_chat_ids` (the bot's linked channels) and the plain shape only | The mirror of `notify`: tells an audience of visitors. Either sends the body, rendered with the **firing visitor's** variables, or starts the internal announcement flow in every recipient's chat. That flow begins with the firing conversation's **session variables** as its own (kept once with the broadcast, so a copy delivered later still shows what was announced): set `announced = product` before the node, read `###session.announced.name###` inside. `###initiator.*###` is the visitor who fired it, live. Tokens resolve in a `url` button's address too, so `?start={{flow.card}}-###session.announced.id###` deep-links into a product. Recorded as a broadcast (status, stats) and delivered in the background; `when_free` waits for each busy recipient. Never breaks the visitor's flow. Continues to `next`. |
 | `copy_message` | `audience` ∈ `visitors` (default) `chats`; for visitors `audience_ids` / `audience_keys` as in `announce` (empty — every visitor); for chats `target_chat_ids` (tokens ok — `{{owner_chat}}`, the bot's channels and groups, a chat id) | Sends the visitor's **last message** to the bot on as it is ([copyMessage](https://core.telegram.org/bots/api#copymessage)): formatting, caption, photo, video, voice. Visitors get it as a broadcast in the background, at once even mid-conversation, never the writer themself; chats get it at once, one refusing chat leaving the rest. Usually after an `ask_text` with `accept: any`. Continues to `next`. |
 | `album` | `images` (the node's own photo addresses), `images_var` (a variable holding a list of addresses — `session.product.images`; when set, `images` is ignored), `paragraphs` as the first photo's caption (optional) | Several photos as one Telegram media group (up to 10); a single photo goes as a plain photo message. An album carries no keyboard: buttons go on the node after it. Continues to `next`. With no photos (an empty variable) it takes `no_images` when present, else sends the caption alone and continues to `next`. |
@@ -88,9 +96,21 @@ A button leads to a `url` (`http(s)://` or `tg://`) or to a step, its `node` (fo
 | `share` | `mode` ∈ `link` (default) `inline`, `share_url`, `share_text` | `link` → a `url` button to `t.me/share/url`; `inline` → [`switch_inline_query`](https://core.telegram.org/bots/api#inlinekeyboardbutton) (needs inline mode in @BotFather). Inline keyboards only. |
 | `copy_text` | `text` (tokens allowed, ≤ 256 chars after rendering) | [`copy_text`](https://core.telegram.org/bots/api#copytextbutton) button: Telegram puts the text on the clipboard, the bot hears nothing. Inline keyboards only. |
 | `web_app` | `url` (`{{site_url}}/apps/<app>/{{bot.public_key}}{{app_query}}`), `save_to` (default `web_app_data`) | Opens a hosted [Mini App](https://core.telegram.org/bots/webapps) (mini-apps.md). The app's answer (Telegram's [`sendData`](https://core.telegram.org/bots/webapps#initializing-mini-apps) from a **reply** keyboard, the page's own submit from an inline button — the hosted pages do either) lands in `user.<save_to>` and the flow continues to `next` (0). `hooks[]` (from index 10) hold the branches that run after the app's hook actions — `script`/`condition` only, the app's values in `session.input`. |
-| `list_buttons` | `options_var` (a variable holding a list of strings), `save_to`, `buttons_per_row` (≥1) | The button expands into one button per option at send time. A pick writes `user.<save_to>` = the label and `user.<save_to>_index` = its position, then continues to `next`. This is how a choice from data is built — there is no choice node. |
+| `list_buttons` | `options_var` (a variable holding a list of **strings** — a path, not an expression), `save_to`, `buttons_per_row` (≥1) | The button expands into one button per option at send time; the button's own `text` is not shown. A pick writes `user.<save_to>` = the label and `user.<save_to>_index` = its position from 0, then continues to `next`. This is how a choice from data is built — there is no choice node. |
 
 A conditional link/app/list: `{ "text": "…", "node": { "type": "visibility", …, "next": { "type": "url", … } } }`.
+
+A choice among objects goes through their labels: a script before the message makes the list of strings, a script under the list takes the object back by the position.
+
+```
+doctor_names = map(app.doctors, item.name)
+```
+
+```
+doctor = nth(app.doctors, user.doctor_pick_index)
+```
+
+with `"options_var": "doctor_names", "save_to": "doctor_pick"` between them. A list of objects in `options_var` shows no usable labels.
 
 ## Steps that sell and let in
 
@@ -103,4 +123,19 @@ A conditional link/app/list: `{ "text": "…", "node": { "type": "visibility", �
 
 ## Where the runtime writes for you
 
-`ask_*.variable_name`, `list_buttons.save_to` (+ `_index`), `poll.save_to`, `check_subscription.save_to`, `web_app.save_to`, `invoice_*.save_to`, `channel_access.save_to` — all land in `user.*` (forever, per visitor). A dotted target writes inside an object, making the objects on the way: `variable_name: "order.phone"` → `user.order.phone`, the rest of `user.order` kept. What a script computes should live in `session.*` unless it must outlive the conversation.
+`ask_*.variable_name`, `list_buttons.save_to` (+ `_index`), `poll.save_to`, `check_subscription.save_to`, `web_app.save_to`, `ai.save_to`, `invoice_*.save_to`, `channel_access.save_to` — all land in `user.*` (forever, per visitor). A dotted target writes inside an object, making the objects on the way: `variable_name: "order.phone"` → `user.order.phone`, the rest of `user.order` kept. What a script computes should live in `session.*` unless it must outlive the conversation.
+
+## When a step fails
+
+A step that fails as the flow runs — a script error, a chat the bot cannot reach — takes its `error` slot where the type has one. Without it the visitor reads «⚠️ Щось пішло не так. Спробуйте ще раз трохи пізніше.» and the flow stops on that step.
+
+The owner gets a message from the bot in their own chat with it, once an hour for a step at most:
+
+```
+⚠️ Помилка у ланці «Запис»
+Крок: Зберегти бронь
+Line 4: Error in num(): Cannot convert "abc" to number
+Відвідувач: Оля (@olya_k)
+```
+
+A script error opens with `Line N:`, the line as the script is written. The report carries no variable values beyond what the error text quotes, and a visitor's values are not read through these tools: the owner sees them in the visitor's card in Lanka.
